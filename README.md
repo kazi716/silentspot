@@ -1,6 +1,17 @@
 # 🎧 SilentSpot - Quiet Workspaces & Real-Time Acoustic Intelligence
 
+> 🎓 **Project created during the Google for Developers: Build with AI Bootcamp at Techno India University (TIU), Kolkata** (August 9, 2026).
+
 SilentSpot is a modern web application for discovering quiet workspaces, cafés, and libraries with real-time noise levels (dB), Wi-Fi speeds, power outlet availability %, and stay policies.
+
+---
+
+## 🏛️ About The TIU Bootcamp Project
+This application was conceptualized and built during the **Build with AI Bootcamp** organized by **Google for Developers** & **Hack2Skill** at **Techno India University (TIU), Kolkata**. 
+
+It combines **Generative UI design ideation**, **Acoustic Intelligence**, and **Interactive GIS Mapping** to solve the productivity challenge of finding quiet focus spaces in urban environments.
+
+---
 
 ## 🌟 Key Features
 - 🔍 **Interactive Workspace Discovery**: Filter spots by noise level (<45 dB), Wi-Fi speed (100+ Mbps), power outlets (>80%), cafés, and libraries.
@@ -9,6 +20,8 @@ SilentSpot is a modern web application for discovering quiet workspaces, cafés,
 - 📊 **Workspace Comparison Matrix**: Side-by-side technical & acoustic comparison table.
 - 🎧 **Focus Audio Synthesizer**: Built-in background white noise generator (Rain, Café, Ocean Waves, 432Hz Alpha Waves).
 - ⏱️ **Focus Session Timer & Saved Spots**: Track active work sessions and bookmark favorite spots with local storage.
+
+---
 
 ## 🚀 Setup & Local Preview
 Clone the repository and open `index.html` in your browser or run a simple local HTTP server:
