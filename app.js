@@ -224,8 +224,97 @@ const state = {
     targetMarker: null,
     activeAmbientTrack: null,
     ambientNodes: null,
-    ambientGain: null
+    ambientGain: null,
+    totalFocusMinutes: parseInt(localStorage.getItem('silentspot_focus_minutes') || '0', 10)
 };
+
+// --- GAMIFICATION & AI VIBE LOGIC ---
+const GAMIFICATION_LEVELS = [
+    { name: 'Novice', min: 0, icon: 'psychology', color: 'from-gray-300 to-gray-400' },
+    { name: 'Focused', min: 60, icon: 'self_improvement', color: 'from-blue-400 to-indigo-500' },
+    { name: 'Deep Worker', min: 300, icon: 'mindfulness', color: 'from-emerald-400 to-teal-500' },
+    { name: 'Zen Master', min: 1000, icon: 'diamond', color: 'from-purple-500 to-fuchsia-500' },
+];
+
+function getUserLevel(minutes) {
+    let currentLevel = GAMIFICATION_LEVELS[0];
+    let nextLevel = GAMIFICATION_LEVELS[1];
+    
+    for (let i = 0; i < GAMIFICATION_LEVELS.length; i++) {
+        if (minutes >= GAMIFICATION_LEVELS[i].min) {
+            currentLevel = GAMIFICATION_LEVELS[i];
+            nextLevel = GAMIFICATION_LEVELS[i + 1] || null;
+        }
+    }
+    return { currentLevel, nextLevel };
+}
+
+function generateVibeSummary(venue) {
+    const isQuiet = venue.noiseDb <= 45;
+    const isFast = venue.wifiMbps >= 100;
+    const isPower = venue.powerOutlets >= 70;
+    
+    let vibes = [];
+    if (isQuiet && isFast) vibes.push("Ultimate productivity sanctuary");
+    else if (isQuiet) vibes.push("Library-like hush for deep work");
+    else if (isFast) vibes.push("High-speed hub with energetic chatter");
+    else vibes.push("Casual spot for light reading");
+    
+    if (venue.amenities.includes("Ergonomic Chairs")) vibes[0] += " & great seating.";
+    else if (venue.amenities.includes("Abundant Natural Light")) vibes[0] += " drenched in sunlight.";
+    else if (isPower) vibes[0] += " with endless power.";
+    else vibes[0] += ".";
+    
+    return vibes[0];
+}
+
+function renderProfileView() {
+    const { currentLevel, nextLevel } = getUserLevel(state.totalFocusMinutes);
+    
+    document.getElementById('profile-focus-minutes').textContent = state.totalFocusMinutes;
+    document.getElementById('profile-level-name').textContent = currentLevel.name;
+    
+    const badge = document.getElementById('profile-level-badge');
+    badge.className = `w-24 h-24 rounded-full bg-gradient-to-br ${currentLevel.color} mx-auto flex items-center justify-center shadow-lg border-4 border-white dark:border-dark-surface-card mb-3`;
+    badge.innerHTML = `<span class="material-symbols-outlined text-5xl text-white">${currentLevel.icon}</span>`;
+    
+    const progressBar = document.getElementById('profile-progress-bar');
+    const nextLevelText = document.getElementById('profile-next-level');
+    
+    if (nextLevel) {
+        const progress = Math.min(100, (state.totalFocusMinutes / nextLevel.min) * 100);
+        progressBar.style.width = `${progress}%`;
+        nextLevelText.textContent = `${nextLevel.name} (${nextLevel.min}m)`;
+    } else {
+        progressBar.style.width = '100%';
+        nextLevelText.textContent = 'Max Level Reached!';
+    }
+    
+    const leaderboardList = document.getElementById('leaderboard-list');
+    const mockUsers = [
+        { name: "Sarah K.", mins: 1240, level: "Zen Master" },
+        { name: "Alex M.", mins: 850, level: "Deep Worker" },
+        { name: "You", mins: state.totalFocusMinutes, level: currentLevel.name, isUser: true },
+        { name: "Jordan T.", mins: 320, level: "Deep Worker" },
+        { name: "Emily R.", mins: 45, level: "Novice" }
+    ];
+    
+    mockUsers.sort((a, b) => b.mins - a.mins);
+    
+    leaderboardList.innerHTML = mockUsers.map((u, i) => `
+        <div class="flex items-center justify-between p-4 ${u.isUser ? 'bg-primary/5 dark:bg-primary/10' : ''}">
+            <div class="flex items-center gap-4">
+                <div class="font-bold text-secondary dark:text-gray-400 w-4 text-center">#${i + 1}</div>
+                <div>
+                    <div class="font-semibold text-sm ${u.isUser ? 'text-primary dark:text-primary-fixed-dim' : 'text-on-surface dark:text-gray-200'}">${u.name}</div>
+                    <div class="text-[10px] text-secondary dark:text-gray-400">${u.level}</div>
+                </div>
+            </div>
+            <div class="font-data-display text-sm font-bold text-on-surface dark:text-white">${u.mins} <span class="text-[10px] font-normal text-secondary">mins</span></div>
+        </div>
+    `).join('');
+}
+// ------------------------------------
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
@@ -658,11 +747,13 @@ function switchTab(tabName) {
 
     // Tab-specific handlers
     if (tabName === 'map') {
-        setTimeout(initLeafletMap, 100);
-    } else if (tabName === 'saved') {
-        renderSavedVenues();
+        setTimeout(() => {
+            if (state.leafletMap) state.leafletMap.invalidateSize();
+        }, 100);
     } else if (tabName === 'compare') {
-        renderCompareMatrix();
+        renderComparisonTable();
+    } else if (tabName === 'profile') {
+        renderProfileView();
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -759,6 +850,7 @@ function createVenueCardHtml(venue) {
     const isSaved = state.savedVenueIds.includes(venue.id);
     const bookmarkIcon = isSaved ? 'bookmark' : 'bookmark_border';
     const bookmarkClass = isSaved ? 'text-primary dark:text-primary-fixed-dim' : 'text-secondary hover:text-primary';
+    const aiVibe = generateVibeSummary(venue);
 
     return `
         <article id="card-${venue.id}" class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl shadow-ambient overflow-hidden border border-outline-variant/30 dark:border-dark-surface-border transition-all hover:shadow-modal hover:-translate-y-1 cursor-pointer flex flex-col group">
@@ -789,6 +881,12 @@ function createVenueCardHtml(venue) {
                             <span class="block font-data-display text-base font-extrabold text-primary dark:text-primary-fixed-dim leading-none">${venue.dbAvg}</span>
                             <span class="block font-label-caps text-[9px] font-bold text-primary dark:text-primary-fixed-dim uppercase tracking-wider">dB AVG</span>
                         </div>
+                    </div>
+
+                    <!-- AI Vibe Insight -->
+                    <div class="mb-3 px-2 py-1.5 bg-gradient-to-r from-purple-500/10 to-transparent border-l-2 border-purple-500 rounded-r text-[10px] font-medium text-secondary dark:text-gray-300 flex items-start gap-1">
+                        <span class="material-symbols-outlined text-purple-500 text-[14px]">auto_awesome</span>
+                        <span>${aiVibe}</span>
                     </div>
 
                     <!-- Amenities Tags -->
@@ -1135,6 +1233,7 @@ function openVenueDetail(venueId) {
     if (!container) return;
 
     const isSaved = state.savedVenueIds.includes(venue.id);
+    const aiVibe = generateVibeSummary(venue);
 
     container.innerHTML = `
         <!-- Detail Hero Section -->
@@ -1152,8 +1251,17 @@ function openVenueDetail(venueId) {
         <!-- Main Detail Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column: Primary Details -->
-            <div class="lg:col-span-2 flex flex-col gap-8">
+            <div class="lg:col-span-2 flex flex-col gap-6">
                 
+                <!-- AI Vibe Section -->
+                <div class="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-5 rounded-2xl border border-purple-100 dark:border-purple-800/50 flex items-start gap-3">
+                    <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-2xl animate-pulse">auto_awesome</span>
+                    <div>
+                        <h4 class="text-sm font-bold text-purple-900 dark:text-purple-300 mb-1">AI Vibe Check</h4>
+                        <p class="text-sm text-purple-800 dark:text-purple-200/80">${aiVibe}</p>
+                    </div>
+                </div>
+
                 <!-- Address Section -->
                 <section class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-surface-container-lowest dark:bg-dark-surface-card p-5 rounded-2xl border border-outline-variant/30 dark:border-dark-surface-border shadow-ambient">
                     <div class="flex items-start gap-3">
@@ -1569,6 +1677,12 @@ function initCheckInModal() {
 
     if (cancelBtn) {
         cancelBtn.addEventListener('click', () => {
+            if (state.checkInSeconds > 0) {
+                // Earn 1 focus minute per minute focused (or at least 1 min if under 1 minute for demo)
+                const earnedMinutes = Math.max(1, Math.floor(state.checkInSeconds / 60));
+                state.totalFocusMinutes += earnedMinutes;
+                localStorage.setItem('silentspot_focus_minutes', state.totalFocusMinutes);
+            }
             stopCheckInTimer();
             modal.classList.add('hidden');
         });

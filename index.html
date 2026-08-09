@@ -137,6 +137,10 @@
                     <span>Saved</span>
                     <span id="saved-badge" class="hidden absolute -top-1 -right-2 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
                 </button>
+                <button data-tab="profile" class="nav-link font-body-md font-medium text-secondary hover:text-primary dark:hover:text-primary-fixed-dim transition-colors flex items-center gap-1.5 py-1">
+                    <span class="material-symbols-outlined text-lg">military_tech</span>
+                    <span>Profile</span>
+                </button>
             </nav>
 
             <!-- Location Selector & Theme Toggle -->
@@ -499,6 +503,52 @@
             </div>
         </section>
 
+        <!-- VIEW 8: PROFILE & LEADERBOARD (GAMIFICATION) -->
+        <section id="view-profile" class="tab-view hidden">
+            <div class="mb-6">
+                <h2 class="font-headline-lg text-2xl font-bold mb-1">Your Focus Profile</h2>
+                <p class="text-secondary dark:text-gray-400 text-sm">Track your productivity, earn badges, and climb the SilentSpot leaderboard.</p>
+            </div>
+
+            <!-- Profile Summary Card -->
+            <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-6 md:p-8 rounded-3xl border border-outline-variant/30 dark:border-dark-surface-border shadow-ambient mb-8 flex flex-col md:flex-row items-center gap-8">
+                <div class="flex-shrink-0 text-center">
+                    <div id="profile-level-badge" class="w-24 h-24 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 mx-auto flex items-center justify-center shadow-lg border-4 border-white dark:border-dark-surface-card mb-3">
+                        <span class="material-symbols-outlined text-5xl text-white">psychology</span>
+                    </div>
+                    <h3 id="profile-level-name" class="font-headline-sm text-lg font-bold text-on-surface dark:text-white">Novice</h3>
+                </div>
+                
+                <div class="flex-grow w-full">
+                    <div class="flex justify-between items-end mb-2">
+                        <div>
+                            <div class="text-sm text-secondary dark:text-gray-400 font-semibold mb-1">Total Focus Time</div>
+                            <div class="flex items-baseline gap-1">
+                                <span id="profile-focus-minutes" class="font-data-display text-4xl font-extrabold text-primary dark:text-primary-fixed-dim">0</span>
+                                <span class="text-sm font-semibold text-secondary dark:text-gray-400">minutes</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-secondary dark:text-gray-400 font-semibold mb-1">Next Level</div>
+                            <div id="profile-next-level" class="text-sm font-bold text-on-surface dark:text-gray-200">Focused (60m)</div>
+                        </div>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full h-3 bg-surface-container dark:bg-dark-surface-border rounded-full overflow-hidden">
+                        <div id="profile-progress-bar" class="h-full bg-primary rounded-full transition-all duration-1000 w-0"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Leaderboard -->
+            <h3 class="font-headline-sm text-xl font-bold mb-4">Global Leaderboard</h3>
+            <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-outline-variant/30 dark:border-dark-surface-border shadow-ambient overflow-hidden">
+                <div id="leaderboard-list" class="divide-y divide-outline-variant/20 dark:divide-dark-surface-border">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- MOBILE BOTTOM NAVIGATION BAR -->
@@ -518,6 +568,10 @@
         <button data-tab="saved" class="mobile-nav-btn flex flex-col items-center justify-center text-xs font-semibold py-1 relative">
             <span class="material-symbols-outlined text-xl mb-0.5">bookmark</span>
             <span>Saved</span>
+        </button>
+        <button data-tab="profile" class="mobile-nav-btn flex flex-col items-center justify-center text-xs font-semibold py-1">
+            <span class="material-symbols-outlined text-xl mb-0.5">military_tech</span>
+            <span>Profile</span>
         </button>
     </nav>
 

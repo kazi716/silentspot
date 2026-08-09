@@ -19,7 +19,8 @@ It combines **Generative UI design ideation**, **Acoustic Intelligence**, and **
 - 🎙️ **Live dB Sound Check**: Web Audio API room noise meter using microphone input & simulated spectrum visualizer.
 - 📊 **Workspace Comparison Matrix**: Side-by-side technical & acoustic comparison table.
 - 🎧 **Focus Audio Synthesizer**: Built-in background white noise generator (Rain, Café, Ocean Waves, 432Hz Alpha Waves).
-- ⏱️ **Focus Session Timer & Saved Spots**: Track active work sessions and bookmark favorite spots with local storage.
+- ⏱️ **Focus Session Timer & Gamification**: Track active work sessions to earn "Focus Minutes". Level up from *Novice* to *Zen Master* and climb the Global Leaderboard.
+- 🔮 **AI Vibe Checks**: Smart, auto-generated 1-sentence summaries predicting the productivity potential of each venue based on its acoustics and amenities.
 
 ---
 
