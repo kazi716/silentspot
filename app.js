@@ -1,0 +1,1746 @@
+// SilentSpot - Full Application Logic with Geolocation, Nominatim Map, Workspace Comparison & Focus Audio Synthesizer
+
+// Preset Location Work Hubs
+const PRESET_LOCATIONS = [
+    { name: "Lower Manhattan, NY", lat: 40.7185, lng: -74.0080 },
+    { name: "Midtown West, NY", lat: 40.7535, lng: -73.9810 },
+    { name: "Greenwich Village, NY", lat: 40.7295, lng: -73.9970 },
+    { name: "SoHo, NY", lat: 40.7250, lng: -74.0025 },
+    { name: "Brooklyn Heights, NY", lat: 40.6945, lng: -73.9930 },
+    { name: "Upper East Side, NY", lat: 40.7794, lng: -73.9632 }
+];
+
+// Initial Venues Database
+const VENUES = [
+    {
+        id: "chapter-house-cafe",
+        name: "The Chapter House Café",
+        type: "Quiet Café",
+        category: "cafe",
+        address: "123 Hudson St, New York, NY",
+        neighborhood: "Lower Manhattan, NY",
+        distance: "0.3 mi",
+        calculatedDistance: 0.3,
+        lat: 40.7185,
+        lng: -74.0080,
+        dbAvg: 42,
+        dbStatus: "Library-like hush. Ideal for deep focus.",
+        wifiSpeed: 145,
+        wifiStatus: "Stable & Fiber-backed",
+        outletCoverage: 90,
+        outletStatus: "Every table has access",
+        seating: "Ergonomic Seating",
+        seatingDesc: "Large shared oak tables & padded ergonomic chairs available.",
+        stayPolicy: "3 hr+ Stay Friendly",
+        stayPolicyDesc: "No purchase-per-hour pressure. The staff respects focused work sessions.",
+        occupancy: "Low",
+        occupancyColor: "bg-emerald-500",
+        hours: "Open until 8:00 PM",
+        image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+        amenities: ["Abundant Natural Light", "Ergonomic Chairs", "Call-friendly Patio", "Printing Services"],
+        feedback: [
+            { quote: "Perfect for deep work on Tuesday mornings. Extremely quiet.", author: "Sarah T., Designer" },
+            { quote: "Great coffee, but seating fills up by 10 AM on weekends.", author: "Mike R., Developer" }
+        ]
+    },
+    {
+        id: "foundry-library",
+        name: "Foundry Library & Coworking",
+        type: "Coworking Space",
+        category: "coworking",
+        address: "500 5th Ave, New York, NY",
+        neighborhood: "Midtown West, NY",
+        distance: "0.8 mi",
+        calculatedDistance: 0.8,
+        lat: 40.7535,
+        lng: -73.9810,
+        dbAvg: 38,
+        dbStatus: "Absolute silence zone. Strict no-talking policy.",
+        wifiSpeed: 250,
+        wifiStatus: "Gigabit Ultra-Fast",
+        outletCoverage: 100,
+        outletStatus: "Built-in AC & USB-C ports on all carrels",
+        seating: "Standing & Task Chairs",
+        seatingDesc: "Height-adjustable standing desks and Herman Miller Aeron chairs.",
+        stayPolicy: "All Day Access",
+        stayPolicyDesc: "Open to public for single-day pass or quiet study passes.",
+        occupancy: "Medium",
+        occupancyColor: "bg-yellow-400",
+        hours: "Open 24 Hours",
+        image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80",
+        amenities: ["Standing Desks", "Quiet Zone Only", "High-speed Scanner", "Ergonomic Chairs"],
+        feedback: [
+            { quote: "Best venue in the city if you have a tight deadline. Pure concentration.", author: "Elena M., Architect" }
+        ]
+    },
+    {
+        id: "silent-spire",
+        name: "The Silent Spire Reading Room",
+        type: "Library",
+        category: "library",
+        address: "70 Washington Sq S, New York, NY",
+        neighborhood: "Greenwich Village, NY",
+        distance: "0.5 mi",
+        calculatedDistance: 0.5,
+        lat: 40.7295,
+        lng: -73.9970,
+        dbAvg: 35,
+        dbStatus: "Whisper-quiet sanctuary with acoustic wall baffles.",
+        wifiSpeed: 180,
+        wifiStatus: "High Speed Campus Network",
+        outletCoverage: 85,
+        outletStatus: "Under-desk power strips",
+        seating: "Reading Lounges",
+        seatingDesc: "Comfortable leather armchairs and wide wood research benches.",
+        stayPolicy: "Unlimited Stay",
+        stayPolicyDesc: "Free public access with quiet study protocol.",
+        occupancy: "Low",
+        occupancyColor: "bg-emerald-500",
+        hours: "Open until 10:00 PM",
+        image: "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=1200&q=80",
+        amenities: ["Abundant Natural Light", "Ergonomic Chairs", "Silent Study Pods"],
+        feedback: [
+            { quote: "Sublime atmosphere. High ceilings, soothing acoustic dampening.", author: "David K., Author" }
+        ]
+    },
+    {
+        id: "nook-and-bean",
+        name: "Nook & Bean Artisanal Roasters",
+        type: "Quiet Café",
+        category: "cafe",
+        address: "45 Montague St, Brooklyn, NY",
+        neighborhood: "Brooklyn Heights, NY",
+        distance: "1.2 mi",
+        calculatedDistance: 1.2,
+        lat: 40.6945,
+        lng: -73.9930,
+        dbAvg: 46,
+        dbStatus: "Soft ambient jazz. Warm focus environment.",
+        wifiSpeed: 120,
+        wifiStatus: "Fast Guest Wi-Fi",
+        outletCoverage: 75,
+        outletStatus: "Outlets along wall booths",
+        seating: "Plush Leather Booths",
+        seatingDesc: "Spacious booths with soft lighting and USB charging.",
+        stayPolicy: "2-3 hr Friendly",
+        stayPolicyDesc: "Laptop friendly seating areas near the garden window.",
+        occupancy: "Medium",
+        occupancyColor: "bg-yellow-400",
+        hours: "Open until 7:00 PM",
+        image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=80",
+        amenities: ["Call-friendly Patio", "Natural Light", "Specialty Coffee Bar"],
+        feedback: [
+            { quote: "The outdoor patio is great for taking phone calls without annoying others.", author: "James P., Product Manager" }
+        ]
+    },
+    {
+        id: "metropolitan-vault",
+        name: "Metropolitan Research Vault",
+        type: "Library",
+        category: "library",
+        address: "1000 5th Ave, New York, NY",
+        neighborhood: "Upper East Side, NY",
+        distance: "2.1 mi",
+        calculatedDistance: 2.1,
+        lat: 40.7794,
+        lng: -73.9632,
+        dbAvg: 32,
+        dbStatus: "Pin-drop quiet. Zero external noise intrusion.",
+        wifiSpeed: 300,
+        wifiStatus: "Fiber Optic Direct",
+        outletCoverage: 95,
+        outletStatus: "Dedicated power per seat",
+        seating: "Individual Study Carrels",
+        seatingDesc: "Private partitioned desks with lamp and double outlets.",
+        stayPolicy: "Full Day Pass",
+        stayPolicyDesc: "Visitor registration required at entrance. Highly respected silence.",
+        occupancy: "Low",
+        occupancyColor: "bg-emerald-500",
+        hours: "Open until 6:00 PM",
+        image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1200&q=80",
+        amenities: ["Ergonomic Chairs", "Printing Services", "Silent Study Pods"],
+        feedback: [
+            { quote: "Unmatched study environment if you need to read 200 pages in peace.", author: "Chloe L., Researcher" }
+        ]
+    },
+    {
+        id: "komorebi-garden",
+        name: "Komorebi Zen Workspace",
+        type: "Coworking Space",
+        category: "coworking",
+        address: "180 Spring St, New York, NY",
+        neighborhood: "SoHo, NY",
+        distance: "0.6 mi",
+        calculatedDistance: 0.6,
+        lat: 40.7250,
+        lng: -74.0025,
+        dbAvg: 40,
+        dbStatus: "Biophilic indoor garden with soft water fountain hum.",
+        wifiSpeed: 210,
+        wifiStatus: "Ultra Stable Mesh",
+        outletCoverage: 90,
+        outletStatus: "Wireless charging pads + AC",
+        seating: "Japanese Low Benches & Ergonomic Chairs",
+        seatingDesc: "Custom bamboo desks, posture stools, and ergonomic chairs.",
+        stayPolicy: "3 hr+ Stay Friendly",
+        stayPolicyDesc: "Relaxed atmosphere with herbal tea bar included.",
+        occupancy: "Low",
+        occupancyColor: "bg-emerald-500",
+        hours: "Open until 9:00 PM",
+        image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80",
+        amenities: ["Abundant Natural Light", "Ergonomic Chairs", "Call-friendly Patio"],
+        feedback: [
+            { quote: "The indoor plants and quiet ambient fountain make focus effortless.", author: "Kenji S., Developer" }
+        ]
+    }
+];
+
+// App State
+const state = {
+    currentTab: 'explore',
+    currentLocation: 'Lower Manhattan, NY',
+    currentLat: 40.7185,
+    currentLng: -74.0080,
+    maxDistanceRadius: 10.0,
+    savedVenueIds: JSON.parse(localStorage.getItem('silentspot_saved_venues') || '["chapter-house-cafe"]'),
+    activeQuickFilter: 'all',
+    searchQuery: '',
+    filters: {
+        maxDb: 55,
+        minWifi: 0,
+        minOutlets: 0,
+        amenities: []
+    },
+    selectedVenueId: null,
+    checkInVenueId: null,
+    checkInTimerInterval: null,
+    checkInSeconds: 0,
+    micStream: null,
+    audioContext: null,
+    analyser: null,
+    leafletMap: null,
+    mapMarkers: [],
+    heatmapCircles: [],
+    targetMarker: null,
+    activeAmbientTrack: null,
+    ambientNodes: null,
+    ambientGain: null
+};
+
+// Initialize App
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initNavigation();
+    initLocationModal();
+    initQuickFilters();
+    initFilterModal();
+    initCheckInModal();
+    initSoundCheck();
+    initAmbientAudio();
+    
+    // Initial distance calculation
+    setLocation(state.currentLocation, state.currentLat, state.currentLng);
+    updateSavedBadge();
+});
+
+// Haversine Distance Formula (miles)
+function calcHaversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 3958.8; // Earth radius in miles
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+// Generate Realistic Quiet Venues for ANY Location Shared or Clicked
+function generateVenuesForLocation(lat, lng, locationName) {
+    const cleanName = locationName.split(',')[0].trim();
+    const locId = cleanName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+    const templateSpots = [
+        {
+            id: `dyn-vault-${locId}-1`,
+            name: `${cleanName} Central Reading Vault`,
+            type: "Library",
+            category: "library",
+            address: `Central District, ${cleanName}`,
+            neighborhood: `${cleanName}`,
+            lat: lat + 0.0032,
+            lng: lng - 0.0025,
+            dbAvg: 34,
+            dbStatus: "Acoustically soundproofed research hall.",
+            wifiSpeed: 280,
+            wifiStatus: "High Speed Fiber Direct",
+            outletCoverage: 95,
+            outletStatus: "Outlets at every study desk",
+            seating: "Study Carrels",
+            seatingDesc: "Spacious individual desks with reading lamps.",
+            stayPolicy: "Full Day Access",
+            stayPolicyDesc: "Open to public for quiet study.",
+            occupancy: "Low",
+            occupancyColor: "bg-emerald-500",
+            hours: "Open until 9:00 PM",
+            image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80",
+            amenities: ["Ergonomic Chairs", "Abundant Natural Light", "Printing Services"],
+            feedback: [
+                { quote: "Super quiet space, perfect for focus.", author: "Local Scholar" }
+            ]
+        },
+        {
+            id: `dyn-cafe-${locId}-2`,
+            name: `The Chapter & Grind Café`,
+            type: "Quiet Café",
+            category: "cafe",
+            address: `Main Ave, ${cleanName}`,
+            neighborhood: `${cleanName}`,
+            lat: lat - 0.0038,
+            lng: lng + 0.0029,
+            dbAvg: 41,
+            dbStatus: "Gentle low hum. Great focus atmosphere.",
+            wifiSpeed: 155,
+            wifiStatus: "Stable Guest Network",
+            outletCoverage: 85,
+            outletStatus: "Outlets along perimeter wall",
+            seating: "Ergonomic Chairs",
+            seatingDesc: "Comfortable padded seating and wide shared tables.",
+            stayPolicy: "3 hr+ Stay Friendly",
+            stayPolicyDesc: "Laptop friendly seating and respectful staff.",
+            occupancy: "Low",
+            occupancyColor: "bg-emerald-500",
+            hours: "Open until 8:00 PM",
+            image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
+            amenities: ["Abundant Natural Light", "Call-friendly Patio", "Ergonomic Chairs"],
+            feedback: [
+                { quote: "Ideal place for morning coding sessions.", author: "Remote Dev" }
+            ]
+        },
+        {
+            id: `dyn-lab-${locId}-3`,
+            name: `${cleanName} Serenity Work Lab`,
+            type: "Coworking Space",
+            category: "coworking",
+            address: `Innovation Hub, ${cleanName}`,
+            neighborhood: `${cleanName}`,
+            lat: lat + 0.0048,
+            lng: lng + 0.0042,
+            dbAvg: 37,
+            dbStatus: "Strict silent focus floor.",
+            wifiSpeed: 320,
+            wifiStatus: "Gigabit Mesh",
+            outletCoverage: 100,
+            outletStatus: "Built-in AC & USB ports",
+            seating: "Standing & Task Chairs",
+            seatingDesc: "Height adjustable standing desks.",
+            stayPolicy: "Day Pass / Flexible",
+            stayPolicyDesc: "Quiet protocol strictly enforced.",
+            occupancy: "Medium",
+            occupancyColor: "bg-yellow-400",
+            hours: "Open 24/7",
+            image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80",
+            amenities: ["Standing Desks", "Quiet Zone Only", "Printing Services"],
+            feedback: [
+                { quote: "Fast Wi-Fi and zero noise distractions.", author: "Designer" }
+            ]
+        },
+        {
+            id: `dyn-nook-${locId}-4`,
+            name: `Acoustic Nook & Roastery`,
+            type: "Quiet Café",
+            category: "cafe",
+            address: `South St, ${cleanName}`,
+            neighborhood: `${cleanName}`,
+            lat: lat - 0.0022,
+            lng: lng - 0.0048,
+            dbAvg: 44,
+            dbStatus: "Soft acoustic background music.",
+            wifiSpeed: 140,
+            wifiStatus: "Fast Wi-Fi",
+            outletCoverage: 80,
+            outletStatus: "Booths equipped with outlets",
+            seating: "Leather Booths",
+            seatingDesc: "Spacious booths with soft lighting.",
+            stayPolicy: "2-3 hr Friendly",
+            stayPolicyDesc: "Staff respects focused work.",
+            occupancy: "Low",
+            occupancyColor: "bg-emerald-500",
+            hours: "Open until 7:30 PM",
+            image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=80",
+            amenities: ["Call-friendly Patio", "Natural Light"],
+            feedback: [
+                { quote: "Cozy atmosphere with great seating.", author: "Freelancer" }
+            ]
+        }
+    ];
+
+    templateSpots.forEach(spot => {
+        const exists = VENUES.some(v => v.id === spot.id);
+        if (!exists) {
+            VENUES.push(spot);
+        }
+    });
+}
+
+// Location Selector System with Geocoding
+function initLocationModal() {
+    const modal = document.getElementById('location-modal');
+    const openBtn = document.getElementById('btn-location-selector');
+    const closeBtn = document.getElementById('btn-close-location-modal');
+    const applyBtn = document.getElementById('btn-apply-location');
+    const gpsBtn = document.getElementById('btn-detect-gps');
+    const gpsBtnText = document.getElementById('gps-btn-text');
+    const searchInput = document.getElementById('location-search-input');
+    const radiusSlider = document.getElementById('location-radius-slider');
+    const radiusDisplay = document.getElementById('location-radius-display');
+    const discoverHereBtn = document.getElementById('btn-discover-here');
+
+    if (openBtn) {
+        openBtn.addEventListener('click', () => {
+            renderPresetLocationsList();
+            modal.classList.remove('hidden');
+        });
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    if (applyBtn) applyBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+    if (discoverHereBtn) {
+        discoverHereBtn.addEventListener('click', () => {
+            generateVenuesForLocation(state.currentLat, state.currentLng, state.currentLocation);
+            setLocation(state.currentLocation, state.currentLat, state.currentLng);
+        });
+    }
+
+    // Radius Slider
+    if (radiusSlider && radiusDisplay) {
+        radiusSlider.addEventListener('input', (e) => {
+            state.maxDistanceRadius = parseFloat(e.target.value);
+            radiusDisplay.textContent = `${state.maxDistanceRadius.toFixed(1)} miles`;
+            renderVenuesGrid();
+        });
+    }
+
+    // GPS Location Detection Button
+    if (gpsBtn) {
+        gpsBtn.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser.');
+                return;
+            }
+
+            gpsBtnText.textContent = 'Locating GPS Coordinates...';
+            gpsBtn.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    
+                    let locationName = 'Current GPS Location';
+                    try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                        const data = await res.json();
+                        if (data && data.display_name) {
+                            const parts = data.display_name.split(',');
+                            locationName = `${parts[0].trim()}, ${parts[1] ? parts[1].trim() : ''}`;
+                        }
+                    } catch (e) {
+                        console.warn('Reverse geocode error:', e);
+                    }
+
+                    gpsBtnText.textContent = 'GPS Found!';
+                    setTimeout(() => {
+                        generateVenuesForLocation(lat, lng, locationName);
+                        setLocation(locationName, lat, lng);
+                        modal.classList.add('hidden');
+                        gpsBtnText.textContent = 'Detect My Current GPS Location';
+                        gpsBtn.disabled = false;
+                    }, 500);
+                },
+                (err) => {
+                    alert('Unable to retrieve your GPS location. Please select or search a location.');
+                    gpsBtnText.textContent = 'Detect My Current GPS Location';
+                    gpsBtn.disabled = false;
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        });
+    }
+
+    // Search Input with OpenStreetMap Nominatim Geocoding API
+    let searchTimeout = null;
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            if (query.length < 2) {
+                renderPresetLocationsList();
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                const list = document.getElementById('preset-locations-list');
+                if (list) list.innerHTML = '<p class="text-xs text-secondary py-2 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-primary animate-ping"></span> Searching world map coordinates...</p>';
+
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+                    const results = await res.json();
+
+                    if (!results || results.length === 0) {
+                        if (list) list.innerHTML = '<p class="text-xs text-secondary py-2">No map locations found for this query.</p>';
+                        return;
+                    }
+
+                    const formattedResults = results.map(item => {
+                        const parts = item.display_name.split(',');
+                        const shortName = `${parts[0].trim()}, ${parts[1] ? parts[1].trim() : ''}`;
+                        return {
+                            name: shortName,
+                            full: item.display_name,
+                            lat: parseFloat(item.lat),
+                            lng: parseFloat(item.lon)
+                        };
+                    });
+
+                    renderCustomLocationsList(formattedResults);
+                } catch (err) {
+                    console.warn('Location search API error:', err);
+                    renderPresetLocationsList();
+                }
+            }, 400);
+        });
+    }
+}
+
+function renderPresetLocationsList() {
+    renderCustomLocationsList(PRESET_LOCATIONS);
+}
+
+function renderCustomLocationsList(locationsArray) {
+    const list = document.getElementById('preset-locations-list');
+    if (!list) return;
+
+    list.innerHTML = locationsArray.map(loc => {
+        const isSelected = state.currentLocation === loc.name;
+        return `
+            <button class="preset-loc-btn w-full p-2.5 rounded-xl border ${isSelected ? 'bg-primary/10 border-primary text-primary font-bold dark:bg-primary-fixed-dim/20 dark:text-primary-fixed-dim dark:border-primary-fixed-dim' : 'border-outline-variant/30 dark:border-dark-surface-border text-on-surface dark:text-gray-200 hover:bg-surface-container dark:hover:bg-dark-surface-border'} flex items-center justify-between text-xs transition-colors" data-name="${loc.name}" data-lat="${loc.lat}" data-lng="${loc.lng}">
+                <div class="flex items-center gap-2 text-left truncate">
+                    <span class="material-symbols-outlined text-base ${isSelected ? 'text-primary dark:text-primary-fixed-dim' : 'text-secondary'} shrink-0">location_on</span>
+                    <span class="truncate">${loc.name}</span>
+                </div>
+                ${isSelected ? '<span class="material-symbols-outlined text-base shrink-0">check</span>' : ''}
+            </button>
+        `;
+    }).join('');
+
+    list.querySelectorAll('.preset-loc-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const name = btn.getAttribute('data-name');
+            const lat = parseFloat(btn.getAttribute('data-lat'));
+            const lng = parseFloat(btn.getAttribute('data-lng'));
+            
+            generateVenuesForLocation(lat, lng, name);
+            setLocation(name, lat, lng);
+            document.getElementById('location-modal').classList.add('hidden');
+        });
+    });
+}
+
+function setLocation(name, lat, lng) {
+    state.currentLocation = name;
+    state.currentLat = lat;
+    state.currentLng = lng;
+
+    const locText = document.getElementById('current-location-text');
+    if (locText) locText.textContent = name;
+
+    // Recalculate distance from new location for all venues
+    VENUES.forEach(venue => {
+        const dist = calcHaversineDistance(lat, lng, venue.lat, venue.lng);
+        venue.calculatedDistance = dist;
+        venue.distance = `${dist.toFixed(1)} mi`;
+    });
+
+    // Sort by proximity
+    VENUES.sort((a, b) => a.calculatedDistance - b.calculatedDistance);
+
+    renderVenuesGrid();
+
+    if (state.leafletMap) {
+        state.leafletMap.flyTo([lat, lng], 13, { duration: 1.2 });
+        renderMapMarkers();
+    }
+}
+
+// Theme Toggle Functionality
+function initTheme() {
+    const isDark = localStorage.getItem('silentspot_theme') === 'dark' || 
+        (!('silentspot_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    
+    if (isDark) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+
+    document.getElementById('btn-theme-toggle').addEventListener('click', () => {
+        const currentlyDark = document.documentElement.classList.contains('dark');
+        if (currentlyDark) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('silentspot_theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('silentspot_theme', 'dark');
+        }
+        if (state.leafletMap) {
+            updateMapTileLayer();
+        }
+    });
+}
+
+// Navigation & Tab Switcher
+function initNavigation() {
+    const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-btn');
+    navLinks.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const targetTab = btn.getAttribute('data-tab');
+            if (targetTab) {
+                switchTab(targetTab);
+            }
+        });
+    });
+
+    document.getElementById('nav-brand').addEventListener('click', () => switchTab('explore'));
+    document.getElementById('btn-toggle-list').addEventListener('click', () => switchTab('explore'));
+    document.getElementById('btn-toggle-map').addEventListener('click', () => switchTab('map'));
+    document.getElementById('map-btn-list').addEventListener('click', () => switchTab('explore'));
+    document.getElementById('btn-back-to-explore').addEventListener('click', () => switchTab('explore'));
+    document.getElementById('btn-explore-from-saved').addEventListener('click', () => switchTab('explore'));
+    document.getElementById('btn-map-soundcheck').addEventListener('click', () => switchTab('soundcheck'));
+
+    // Search Input
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            state.searchQuery = e.target.value.toLowerCase().trim();
+            renderVenuesGrid();
+        });
+    }
+}
+
+function switchTab(tabName) {
+    state.currentTab = tabName;
+
+    // Update nav button active states
+    document.querySelectorAll('.nav-link, .mobile-nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabName) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Hide all view sections
+    document.querySelectorAll('.tab-view').forEach(view => {
+        view.classList.add('hidden');
+        view.classList.remove('active');
+    });
+
+    // Show target view
+    const activeView = document.getElementById(`view-${tabName}`);
+    if (activeView) {
+        activeView.classList.remove('hidden');
+        activeView.classList.add('active');
+    }
+
+    // Tab-specific handlers
+    if (tabName === 'map') {
+        setTimeout(initLeafletMap, 100);
+    } else if (tabName === 'saved') {
+        renderSavedVenues();
+    } else if (tabName === 'compare') {
+        renderCompareMatrix();
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Quick Pills Filters
+function initQuickFilters() {
+    const pills = document.querySelectorAll('.quick-pill');
+    pills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            pills.forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            state.activeQuickFilter = pill.getAttribute('data-quick-filter');
+            renderVenuesGrid();
+        });
+    });
+}
+
+// Filter Venues by Search, Quick Pills, Distance Radius, and Modal Filters
+function getFilteredVenues() {
+    return VENUES.filter(venue => {
+        // Distance Radius Filter
+        if (venue.calculatedDistance && venue.calculatedDistance > state.maxDistanceRadius) {
+            return false;
+        }
+
+        // Search Query
+        if (state.searchQuery) {
+            const q = state.searchQuery;
+            const matchesName = venue.name.toLowerCase().includes(q);
+            const matchesLoc = venue.neighborhood.toLowerCase().includes(q) || venue.address.toLowerCase().includes(q);
+            const matchesType = venue.type.toLowerCase().includes(q);
+            const matchesAmenities = venue.amenities.some(a => a.toLowerCase().includes(q));
+            if (!matchesName && !matchesLoc && !matchesType && !matchesAmenities) {
+                return false;
+            }
+        }
+
+        // Quick Pill Filter
+        if (state.activeQuickFilter === 'silent' && venue.dbAvg >= 45) return false;
+        if (state.activeQuickFilter === 'wifi' && venue.wifiSpeed < 100) return false;
+        if (state.activeQuickFilter === 'outlets' && venue.outletCoverage < 80) return false;
+        if (state.activeQuickFilter === 'cafe' && venue.category !== 'cafe') return false;
+        if (state.activeQuickFilter === 'library' && venue.category !== 'library') return false;
+
+        // Modal Filters
+        if (venue.dbAvg > state.filters.maxDb) return false;
+        if (venue.wifiSpeed < state.filters.minWifi) return false;
+        if (venue.outletCoverage < state.filters.minOutlets) return false;
+        
+        if (state.filters.amenities.length > 0) {
+            const hasAllSelected = state.filters.amenities.every(amenity => venue.amenities.includes(amenity));
+            if (!hasAllSelected) return false;
+        }
+
+        return true;
+    });
+}
+
+// Render Venue Cards Grid
+function renderVenuesGrid() {
+    const grid = document.getElementById('venues-grid');
+    const emptyState = document.getElementById('empty-state');
+    if (!grid || !emptyState) return;
+
+    const filtered = getFilteredVenues();
+
+    if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+    }
+
+    emptyState.classList.add('hidden');
+    grid.innerHTML = filtered.map(venue => createVenueCardHtml(venue)).join('');
+
+    // Attach Click Event Listeners
+    filtered.forEach(venue => {
+        const cardElem = document.getElementById(`card-${venue.id}`);
+        if (cardElem) {
+            cardElem.addEventListener('click', (e) => {
+                if (e.target.closest('.btn-save-bookmark')) {
+                    toggleSaveVenue(venue.id);
+                    return;
+                }
+                openVenueDetail(venue.id);
+            });
+        }
+    });
+}
+
+// Helper: Generate HTML for Venue Card
+function createVenueCardHtml(venue) {
+    const isSaved = state.savedVenueIds.includes(venue.id);
+    const bookmarkIcon = isSaved ? 'bookmark' : 'bookmark_border';
+    const bookmarkClass = isSaved ? 'text-primary dark:text-primary-fixed-dim' : 'text-secondary hover:text-primary';
+
+    return `
+        <article id="card-${venue.id}" class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl shadow-ambient overflow-hidden border border-outline-variant/30 dark:border-dark-surface-border transition-all hover:shadow-modal hover:-translate-y-1 cursor-pointer flex flex-col group">
+            <div class="h-48 w-full relative overflow-hidden bg-surface-container-high dark:bg-dark-surface-border">
+                <img src="${venue.image}" alt="${venue.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy"/>
+                
+                <!-- Floating Distance Badge -->
+                <div class="absolute top-3 left-3 bg-surface-container-lowest/90 dark:bg-dark-bg/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1 text-on-surface dark:text-gray-200 shadow-sm border border-outline-variant/20 dark:border-dark-surface-border">
+                    <span class="material-symbols-outlined text-xs text-primary dark:text-primary-fixed-dim">near_me</span>
+                    <span class="font-data-display text-xs font-semibold">${venue.distance}</span>
+                </div>
+
+                <!-- Floating Bookmark Button -->
+                <button class="btn-save-bookmark absolute top-3 right-3 p-2 rounded-full bg-surface-container-lowest/90 dark:bg-dark-bg/90 backdrop-blur-md ${bookmarkClass} shadow-sm transition-colors hover:scale-110">
+                    <span class="material-symbols-outlined text-lg">${bookmarkIcon}</span>
+                </button>
+            </div>
+
+            <div class="p-5 flex-grow flex flex-col justify-between">
+                <div>
+                    <!-- Header Title & dB Badge -->
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-headline-sm text-lg font-bold text-on-surface dark:text-white group-hover:text-primary dark:group-hover:text-primary-fixed-dim transition-colors leading-snug">${venue.name}</h3>
+                            <p class="text-xs text-secondary dark:text-gray-400 font-medium">${venue.type} • ${venue.neighborhood}</p>
+                        </div>
+                        <div class="bg-primary/10 dark:bg-primary-fixed-dim/15 px-2.5 py-1 rounded-xl text-center min-w-[54px] shrink-0 border border-primary/20">
+                            <span class="block font-data-display text-base font-extrabold text-primary dark:text-primary-fixed-dim leading-none">${venue.dbAvg}</span>
+                            <span class="block font-label-caps text-[9px] font-bold text-primary dark:text-primary-fixed-dim uppercase tracking-wider">dB AVG</span>
+                        </div>
+                    </div>
+
+                    <!-- Amenities Tags -->
+                    <div class="flex flex-wrap gap-1.5 mb-4">
+                        ${venue.amenities.slice(0, 3).map(amenity => `
+                            <span class="bg-surface-container dark:bg-dark-surface-border px-2 py-0.5 rounded-md text-[11px] text-secondary dark:text-gray-300 border border-outline-variant/20 dark:border-dark-surface-border">${amenity}</span>
+                        `).join('')}
+                    </div>
+
+                    <!-- Metrics Bento Grid -->
+                    <div class="grid grid-cols-4 gap-2 bg-surface-container-low dark:bg-dark-bg p-2.5 rounded-xl border border-outline-variant/30 dark:border-dark-surface-border mb-4">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-secondary dark:text-gray-400 font-semibold uppercase">Noise</span>
+                            <span class="font-data-display text-xs font-bold text-on-surface dark:text-gray-200">${venue.dbAvg} dB</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-secondary dark:text-gray-400 font-semibold uppercase">Plugs</span>
+                            <span class="font-data-display text-xs font-bold text-on-surface dark:text-gray-200">${venue.outletCoverage}%</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-secondary dark:text-gray-400 font-semibold uppercase">Wi-Fi</span>
+                            <span class="font-data-display text-xs font-bold text-on-surface dark:text-gray-200">${venue.wifiSpeed}M</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-secondary dark:text-gray-400 font-semibold uppercase">Stay</span>
+                            <span class="font-data-display text-xs font-bold text-on-surface dark:text-gray-200">${venue.stayPolicy.split(' ')[0]}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Footer -->
+                <div class="flex items-center justify-between pt-3 border-t border-outline-variant/30 dark:border-dark-surface-border">
+                    <div class="flex items-center gap-1.5 text-xs font-medium text-secondary dark:text-gray-400">
+                        <span class="w-2.5 h-2.5 rounded-full ${venue.occupancyColor} shadow-sm animate-pulse"></span>
+                        <span>Occupancy: <strong class="text-on-surface dark:text-gray-200">${venue.occupancy}</strong></span>
+                    </div>
+                    <span class="text-xs font-semibold text-primary dark:text-primary-fixed-dim group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                        View Details
+                        <span class="material-symbols-outlined text-sm">chevron_right</span>
+                    </span>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+// Render Workspace Comparison Table Matrix
+function renderCompareMatrix() {
+    const headerRow = document.getElementById('compare-table-header');
+    const tbody = document.getElementById('compare-table-body');
+    if (!headerRow || !tbody) return;
+
+    const visibleVenues = getFilteredVenues().slice(0, 4);
+
+    if (visibleVenues.length === 0) {
+        headerRow.innerHTML = '<th class="p-4">No venues to compare</th>';
+        tbody.innerHTML = '';
+        return;
+    }
+
+    headerRow.innerHTML = `
+        <th class="p-4 text-xs font-bold uppercase text-secondary dark:text-gray-400 w-48">Metric / Spot</th>
+        ${visibleVenues.map(v => `
+            <th class="p-4 text-on-surface dark:text-white">
+                <div class="flex items-center gap-2">
+                    <img src="${v.image}" class="w-10 h-10 rounded-lg object-cover shadow-sm"/>
+                    <div>
+                        <div class="font-headline-sm font-bold text-sm leading-tight">${v.name}</div>
+                        <div class="text-[11px] font-normal text-secondary dark:text-gray-400">${v.type} • ${v.distance}</div>
+                    </div>
+                </div>
+            </th>
+        `).join('')}
+    `;
+
+    tbody.innerHTML = `
+        <tr>
+            <td class="p-4 font-semibold text-secondary dark:text-gray-300">Live Noise Level (dB)</td>
+            ${visibleVenues.map(v => `
+                <td class="p-4">
+                    <span class="font-data-display font-bold text-base ${v.dbAvg < 40 ? 'text-emerald-600 dark:text-emerald-400' : 'text-yellow-600 dark:text-yellow-400'}">${v.dbAvg} dB</span>
+                    <div class="text-[10px] text-secondary">${v.dbStatus}</div>
+                </td>
+            `).join('')}
+        </tr>
+        <tr>
+            <td class="p-4 font-semibold text-secondary dark:text-gray-300">Wi-Fi Speed</td>
+            ${visibleVenues.map(v => `
+                <td class="p-4">
+                    <span class="font-data-display font-bold text-sm text-on-surface dark:text-white">${v.wifiSpeed} Mbps</span>
+                    <div class="text-[10px] text-secondary">${v.wifiStatus}</div>
+                </td>
+            `).join('')}
+        </tr>
+        <tr>
+            <td class="p-4 font-semibold text-secondary dark:text-gray-300">Power Outlet Coverage</td>
+            ${visibleVenues.map(v => `
+                <td class="p-4">
+                    <span class="font-data-display font-bold text-sm text-on-surface dark:text-white">${v.outletCoverage}%</span>
+                    <div class="text-[10px] text-secondary">${v.outletStatus}</div>
+                </td>
+            `).join('')}
+        </tr>
+        <tr>
+            <td class="p-4 font-semibold text-secondary dark:text-gray-300">Seating Ergonomics</td>
+            ${visibleVenues.map(v => `
+                <td class="p-4 font-medium text-on-surface dark:text-gray-200">
+                    ${v.seating}
+                </td>
+            `).join('')}
+        </tr>
+        <tr>
+            <td class="p-4 font-semibold text-secondary dark:text-gray-300">Stay Policy</td>
+            ${visibleVenues.map(v => `
+                <td class="p-4 font-medium text-on-surface dark:text-gray-200">
+                    ${v.stayPolicy}
+                </td>
+            `).join('')}
+        </tr>
+        <tr>
+            <td class="p-4 font-semibold text-secondary dark:text-gray-300">Action</td>
+            ${visibleVenues.map(v => `
+                <td class="p-4">
+                    <button onclick="openVenueDetail('${v.id}')" class="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold hover:bg-primary-container transition-colors">
+                        View Details
+                    </button>
+                </td>
+            `).join('')}
+        </tr>
+    `;
+}
+
+// Web Audio Focus Audio Synthesizer (Rain, Café, Ocean Waves, 432Hz Alpha Binaural Beats)
+function initAmbientAudio() {
+    const ambientCards = document.querySelectorAll('.ambient-card');
+    const stopBtn = document.getElementById('btn-stop-ambient');
+    const volumeSlider = document.getElementById('ambient-volume-slider');
+    const titleElem = document.getElementById('ambient-current-title');
+    const statusElem = document.getElementById('ambient-current-status');
+    const masterIcon = document.getElementById('ambient-master-icon');
+
+    let audioCtx = null;
+
+    function getAudioCtx() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        return audioCtx;
+    }
+
+    function stopCurrentTrack() {
+        if (state.ambientNodes) {
+            if (Array.isArray(state.ambientNodes)) {
+                state.ambientNodes.forEach(n => { try { n.stop(); n.disconnect(); } catch(e){} });
+            } else {
+                try { state.ambientNodes.stop(); state.ambientNodes.disconnect(); } catch(e){}
+            }
+            state.ambientNodes = null;
+        }
+        state.activeAmbientTrack = null;
+        if (titleElem) titleElem.textContent = 'Select a Sound Track';
+        if (statusElem) statusElem.textContent = 'Click play above to start ambient focus audio';
+        if (masterIcon) masterIcon.className = 'material-symbols-outlined text-2xl';
+
+        document.querySelectorAll('.ambient-card').forEach(c => {
+            const btn = c.querySelector('.btn-play-ambient');
+            if (btn) btn.innerHTML = '<span class="material-symbols-outlined text-base">play_arrow</span><span>Play</span>';
+        });
+    }
+
+    if (stopBtn) stopBtn.addEventListener('click', stopCurrentTrack);
+
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', (e) => {
+            if (state.ambientGain) {
+                state.ambientGain.gain.setValueAtTime(parseFloat(e.target.value), getAudioCtx().currentTime);
+            }
+        });
+    }
+
+    ambientCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const soundType = card.getAttribute('data-sound');
+            if (state.activeAmbientTrack === soundType) {
+                stopCurrentTrack();
+                return;
+            }
+
+            stopCurrentTrack();
+            const ctx = getAudioCtx();
+
+            state.ambientGain = ctx.createGain();
+            state.ambientGain.gain.setValueAtTime(volumeSlider ? parseFloat(volumeSlider.value) : 0.7, ctx.currentTime);
+            state.ambientGain.connect(ctx.destination);
+
+            state.activeAmbientTrack = soundType;
+            const cardBtn = card.querySelector('.btn-play-ambient');
+            if (cardBtn) cardBtn.innerHTML = '<span class="material-symbols-outlined text-base">pause</span><span>Stop</span>';
+
+            if (soundType === 'rain') {
+                if (titleElem) titleElem.textContent = 'Playing: Soft Rainfall';
+                if (statusElem) statusElem.textContent = 'Synthetic pink noise rain drops with low-pass filter';
+                
+                const bufferSize = ctx.sampleRate * 2;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const output = buffer.getChannelData(0);
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                    output[i] *= 0.11;
+                    b6 = white * 0.115926;
+                }
+
+                const noise = ctx.createBufferSource();
+                noise.buffer = buffer;
+                noise.loop = true;
+
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 1000;
+
+                noise.connect(filter);
+                filter.connect(state.ambientGain);
+                noise.start();
+                state.ambientNodes = noise;
+
+            } else if (soundType === 'binaural') {
+                if (titleElem) titleElem.textContent = 'Playing: 432Hz Alpha Waves';
+                if (statusElem) statusElem.textContent = '10Hz Alpha brainwave entrainment (432Hz left, 442Hz right)';
+
+                const oscL = ctx.createOscillator();
+                const oscR = ctx.createOscillator();
+                const merger = ctx.createChannelMerger(2);
+
+                oscL.type = 'sine';
+                oscL.frequency.value = 432;
+
+                oscR.type = 'sine';
+                oscR.frequency.value = 442;
+
+                oscL.connect(merger, 0, 0);
+                oscR.connect(merger, 0, 1);
+                merger.connect(state.ambientGain);
+
+                oscL.start();
+                oscR.start();
+                state.ambientNodes = [oscL, oscR];
+
+            } else {
+                // Ocean / Cafe ambient fallback
+                if (titleElem) titleElem.textContent = `Playing: ${soundType === 'cafe' ? 'Café Ambience' : 'Ocean Waves'}`;
+                if (statusElem) statusElem.textContent = 'Modulated background focus audio';
+
+                const osc = ctx.createOscillator();
+                osc.type = 'triangle';
+                osc.frequency.value = soundType === 'cafe' ? 180 : 120;
+                osc.connect(state.ambientGain);
+                osc.start();
+                state.ambientNodes = osc;
+            }
+        });
+    });
+}
+
+// Bookmark / Save Venue Toggle
+function toggleSaveVenue(venueId) {
+    const idx = state.savedVenueIds.indexOf(venueId);
+    if (idx >= 0) {
+        state.savedVenueIds.splice(idx, 1);
+    } else {
+        state.savedVenueIds.push(venueId);
+    }
+    localStorage.setItem('silentspot_saved_venues', JSON.stringify(state.savedVenueIds));
+    updateSavedBadge();
+    renderVenuesGrid();
+    if (state.currentTab === 'saved') {
+        renderSavedVenues();
+    }
+    if (state.selectedVenueId === venueId) {
+        updateDetailSaveButton();
+    }
+}
+
+function updateSavedBadge() {
+    const badge = document.getElementById('saved-badge');
+    if (!badge) return;
+    const count = state.savedVenueIds.length;
+    if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+}
+
+// Saved Venues Tab View Render
+function renderSavedVenues() {
+    const grid = document.getElementById('saved-venues-grid');
+    const emptyState = document.getElementById('saved-empty-state');
+    if (!grid || !emptyState) return;
+
+    const savedVenues = VENUES.filter(v => state.savedVenueIds.includes(v.id));
+
+    if (savedVenues.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+    }
+
+    emptyState.classList.add('hidden');
+    grid.innerHTML = savedVenues.map(venue => createVenueCardHtml(venue)).join('');
+
+    savedVenues.forEach(venue => {
+        const cardElem = document.getElementById(`card-${venue.id}`);
+        if (cardElem) {
+            cardElem.addEventListener('click', (e) => {
+                if (e.target.closest('.btn-save-bookmark')) {
+                    toggleSaveVenue(venue.id);
+                    return;
+                }
+                openVenueDetail(venue.id);
+            });
+        }
+    });
+}
+
+// Venue Detail View
+function openVenueDetail(venueId) {
+    const venue = VENUES.find(v => v.id === venueId);
+    if (!venue) return;
+
+    state.selectedVenueId = venueId;
+    const container = document.getElementById('detail-container');
+    if (!container) return;
+
+    const isSaved = state.savedVenueIds.includes(venue.id);
+
+    container.innerHTML = `
+        <!-- Detail Hero Section -->
+        <section class="relative w-full h-[320px] md:h-[480px] rounded-3xl overflow-hidden mb-8 shadow-ambient">
+            <img src="${venue.image}" alt="${venue.name}" class="w-full h-full object-cover"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6 md:p-10 flex flex-col justify-end text-white">
+                <div class="inline-flex self-start bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold mb-3 border border-white/20">
+                    ${venue.type}
+                </div>
+                <h1 class="font-headline-lg text-2xl md:text-4xl font-bold mb-2">${venue.name}</h1>
+                <p class="text-sm md:text-base text-gray-200">${venue.hours} • Occupancy: <span class="font-bold text-emerald-400">${venue.occupancy}</span></p>
+            </div>
+        </section>
+
+        <!-- Main Detail Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Primary Details -->
+            <div class="lg:col-span-2 flex flex-col gap-8">
+                
+                <!-- Address Section -->
+                <section class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-surface-container-lowest dark:bg-dark-surface-card p-5 rounded-2xl border border-outline-variant/30 dark:border-dark-surface-border shadow-ambient">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-2xl mt-0.5">location_on</span>
+                        <div>
+                            <p class="font-body-lg font-semibold text-on-surface dark:text-white">${venue.address}</p>
+                            <p class="text-xs text-secondary dark:text-gray-400">${venue.neighborhood} (${venue.distance} away)</p>
+                        </div>
+                    </div>
+                    <button class="px-4 py-2 bg-primary/10 dark:bg-primary-fixed-dim/20 text-primary dark:text-primary-fixed-dim rounded-xl text-xs font-semibold hover:bg-primary/20 transition-colors shrink-0 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">directions</span>
+                        Get Directions
+                    </button>
+                </section>
+
+                <!-- Core Workspace Productivity Bento Grid -->
+                <section>
+                    <h2 class="font-headline-md text-xl font-bold mb-4 text-on-surface dark:text-white">Workspace Acoustic & Technical Metrics</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+                        <!-- Live Noise Level Bento Card -->
+                        <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-6 shadow-ambient border border-outline-variant/30 dark:border-dark-surface-border flex flex-col justify-between relative overflow-hidden">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-2 text-secondary dark:text-gray-400 text-xs font-semibold">
+                                    <span class="material-symbols-outlined text-lg">volume_mute</span>
+                                    <span>Noise Level</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-xs font-bold">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Live dB
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-baseline gap-1 mb-1">
+                                    <span class="font-data-display text-5xl font-extrabold text-on-surface dark:text-white">${venue.dbAvg}</span>
+                                    <span class="font-data-display text-lg font-bold text-secondary dark:text-gray-400">dB</span>
+                                </div>
+                                <p class="text-xs text-secondary dark:text-gray-400 font-medium">${venue.dbStatus}</p>
+                            </div>
+                        </div>
+
+                        <!-- Wi-Fi Speed Bento Card -->
+                        <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-6 shadow-ambient border border-outline-variant/30 dark:border-dark-surface-border flex flex-col justify-between">
+                            <div class="flex items-center gap-2 text-secondary dark:text-gray-400 text-xs font-semibold mb-4">
+                                <span class="material-symbols-outlined text-lg">wifi</span>
+                                <span>Wi-Fi Speed</span>
+                            </div>
+                            <div>
+                                <div class="font-data-display text-3xl font-extrabold text-on-surface dark:text-white mb-1">${venue.wifiSpeed} Mbps</div>
+                                <span class="inline-block bg-primary/10 dark:bg-primary-fixed-dim/20 text-primary dark:text-primary-fixed-dim px-2.5 py-0.5 rounded text-xs font-bold">${venue.wifiStatus}</span>
+                            </div>
+                        </div>
+
+                        <!-- Power Outlet Bento Card -->
+                        <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-6 shadow-ambient border border-outline-variant/30 dark:border-dark-surface-border flex flex-col justify-between">
+                            <div class="flex items-center gap-2 text-secondary dark:text-gray-400 text-xs font-semibold mb-4">
+                                <span class="material-symbols-outlined text-lg">electrical_services</span>
+                                <span>Power Outlet Availability</span>
+                            </div>
+                            <div>
+                                <div class="font-data-display text-3xl font-extrabold text-on-surface dark:text-white mb-1">${venue.outletCoverage}%</div>
+                                <p class="text-xs text-secondary dark:text-gray-400 font-medium">${venue.outletStatus}</p>
+                            </div>
+                        </div>
+
+                        <!-- Seating Card -->
+                        <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-6 shadow-ambient border border-outline-variant/30 dark:border-dark-surface-border flex flex-col justify-between">
+                            <div class="flex items-center gap-2 text-secondary dark:text-gray-400 text-xs font-semibold mb-2">
+                                <span class="material-symbols-outlined text-lg">chair_alt</span>
+                                <span>Seating Ergonomics</span>
+                            </div>
+                            <div>
+                                <h3 class="font-headline-sm text-base font-bold text-on-surface dark:text-white mb-1">${venue.seating}</h3>
+                                <p class="text-xs text-secondary dark:text-gray-400 font-medium">${venue.seatingDesc}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- Amenities Checklist -->
+                <section class="bg-surface-container-lowest dark:bg-dark-surface-card p-6 rounded-2xl border border-outline-variant/30 dark:border-dark-surface-border">
+                    <h2 class="font-headline-md text-lg font-bold text-on-surface dark:text-white mb-4">Work Amenities</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        ${venue.amenities.map(amenity => `
+                            <div class="flex items-center gap-3 p-3 bg-surface-container-low dark:bg-dark-bg rounded-xl border border-outline-variant/20 dark:border-dark-surface-border">
+                                <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim bg-primary/10 p-2 rounded-full text-base">check_circle</span>
+                                <span class="text-xs font-semibold text-on-surface dark:text-gray-200">${amenity}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Policy, Feedback & CTA -->
+            <div class="flex flex-col gap-6">
+                <!-- Stay Policy Card -->
+                <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-6 rounded-2xl shadow-ambient border border-outline-variant/30 dark:border-dark-surface-border">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-secondary dark:text-gray-400">hourglass_empty</span>
+                        <h3 class="font-headline-sm text-base font-bold text-on-surface dark:text-white">Stay Policy</h3>
+                    </div>
+                    <p class="text-xs text-secondary dark:text-gray-300 leading-relaxed">
+                        <strong class="text-on-surface dark:text-white">${venue.stayPolicy}.</strong> ${venue.stayPolicyDesc}
+                    </p>
+                </div>
+
+                <!-- Community Feedback Card -->
+                <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-6 rounded-2xl shadow-ambient border border-outline-variant/30 dark:border-dark-surface-border">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-symbols-outlined text-secondary dark:text-gray-400">forum</span>
+                        <h3 class="font-headline-sm text-base font-bold text-on-surface dark:text-white">Community Feedback</h3>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        ${venue.feedback ? venue.feedback.map(f => `
+                            <div class="border-l-2 border-primary p-2 pl-3">
+                                <p class="text-xs italic text-on-surface dark:text-gray-200 mb-1">"${f.quote}"</p>
+                                <span class="text-[10px] font-bold text-secondary dark:text-gray-400">- ${f.author}</span>
+                            </div>
+                        `).join('') : '<p class="text-xs text-secondary">No community reviews yet.</p>'}
+                    </div>
+                </div>
+
+                <!-- CTA Button -->
+                <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-6 rounded-2xl shadow-ambient border border-outline-variant/30 dark:border-dark-surface-border text-center">
+                    <button id="btn-open-checkin" class="w-full bg-primary hover:bg-primary-container text-white font-headline-sm text-sm font-semibold py-3.5 rounded-xl shadow-ambient transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <span class="material-symbols-outlined text-lg">login</span>
+                        <span>Check In / Start Session</span>
+                    </button>
+                    <p class="text-[11px] text-secondary dark:text-gray-400 mt-2">Track live dB and focus session time</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Attach listeners for venue detail view
+    const saveBtn = document.getElementById('btn-save-detail-venue');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            toggleSaveVenue(venue.id);
+        });
+    }
+
+    const shareBtn = document.getElementById('btn-share-venue');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({ title: venue.name, text: `Check out ${venue.name} on SilentSpot!`, url: window.location.href });
+            } else {
+                alert(`Link copied for ${venue.name}!`);
+            }
+        });
+    }
+
+    const checkinBtn = document.getElementById('btn-open-checkin');
+    if (checkinBtn) {
+        checkinBtn.addEventListener('click', () => {
+            openCheckInModal(venue);
+        });
+    }
+
+    switchTab('detail');
+}
+
+function updateDetailSaveButton() {
+    const btnIcon = document.getElementById('detail-bookmark-icon');
+    if (!btnIcon || !state.selectedVenueId) return;
+    const isSaved = state.savedVenueIds.includes(state.selectedVenueId);
+    btnIcon.textContent = isSaved ? 'bookmark' : 'bookmark_border';
+}
+
+// Leaflet Map Initialization & Interactive Map Click Listener
+function initLeafletMap() {
+    const mapContainer = document.getElementById('leaflet-map');
+    if (!mapContainer) return;
+
+    if (state.leafletMap) {
+        state.leafletMap.invalidateSize();
+        return;
+    }
+
+    state.leafletMap = L.map('leaflet-map', {
+        zoomControl: false
+    }).setView([state.currentLat, state.currentLng], 13);
+
+    L.control.zoom({ position: 'bottomright' }).addTo(state.leafletMap);
+
+    updateMapTileLayer();
+    renderMapMarkers();
+
+    // INTERACTIVE MAP CLICK LISTENER: Click anywhere on the map to find quiet spots in that exact location!
+    state.leafletMap.on('click', async (e) => {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+
+        if (state.targetMarker) {
+            state.leafletMap.removeLayer(state.targetMarker);
+        }
+
+        const targetIcon = L.divIcon({
+            className: 'leaflet-div-pin',
+            html: `<div class="custom-map-pin pin-active"><span class="material-symbols-outlined text-sm">my_location</span> Clicked Point</div>`,
+            iconSize: [110, 30],
+            iconAnchor: [55, 15]
+        });
+
+        state.targetMarker = L.marker([lat, lng], { icon: targetIcon }).addTo(state.leafletMap);
+
+        let locationName = `Point (${lat.toFixed(3)}, ${lng.toFixed(3)})`;
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+            const data = await res.json();
+            if (data && data.display_name) {
+                const parts = data.display_name.split(',');
+                locationName = `${parts[0].trim()}, ${parts[1] ? parts[1].trim() : ''}`;
+            }
+        } catch (err) {
+            console.warn('Reverse geocoding error:', err);
+        }
+
+        generateVenuesForLocation(lat, lng, locationName);
+        setLocation(locationName, lat, lng);
+    });
+}
+
+function updateMapTileLayer() {
+    if (!state.leafletMap) return;
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const tileUrl = isDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+    if (state.tileLayer) {
+        state.leafletMap.removeLayer(state.tileLayer);
+    }
+
+    state.tileLayer = L.tileLayer(tileUrl, {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        maxZoom: 19
+    }).addTo(state.leafletMap);
+}
+
+function renderMapMarkers() {
+    if (!state.leafletMap) return;
+
+    // Clear existing markers & heatmap circles
+    state.mapMarkers.forEach(m => state.leafletMap.removeLayer(m));
+    state.heatmapCircles.forEach(c => state.leafletMap.removeLayer(c));
+    state.mapMarkers = [];
+    state.heatmapCircles = [];
+
+    const visibleVenues = getFilteredVenues();
+
+    visibleVenues.forEach(venue => {
+        // Acoustic Heatmap Circle Overlay
+        const circleColor = venue.dbAvg < 40 ? '#006948' : venue.dbAvg < 48 ? '#eab308' : '#ef4444';
+        const circle = L.circle([venue.lat, venue.lng], {
+            color: circleColor,
+            fillColor: circleColor,
+            fillOpacity: 0.18,
+            radius: 350,
+            stroke: false
+        }).addTo(state.leafletMap);
+        state.heatmapCircles.push(circle);
+
+        const pinClass = venue.dbAvg < 40 ? 'pin-quiet' : 'pin-moderate';
+        const customIcon = L.divIcon({
+            className: 'leaflet-div-pin',
+            html: `<div class="custom-map-pin ${pinClass}">${venue.dbAvg} dB</div>`,
+            iconSize: [60, 30],
+            iconAnchor: [30, 15]
+        });
+
+        const marker = L.marker([venue.lat, venue.lng], { icon: customIcon }).addTo(state.leafletMap);
+        marker.on('click', () => {
+            showMapBottomSheet(venue);
+        });
+
+        state.mapMarkers.push(marker);
+    });
+}
+
+function showMapBottomSheet(venue) {
+    const sheet = document.getElementById('map-bottom-sheet');
+    const content = document.getElementById('map-sheet-content');
+    if (!sheet || !content) return;
+
+    content.innerHTML = `
+        <div class="flex justify-between items-start mb-2">
+            <div>
+                <h3 class="font-headline-sm text-base font-bold text-on-surface dark:text-white">${venue.name}</h3>
+                <p class="text-xs text-secondary dark:text-gray-400">${venue.type} • ${venue.distance}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 my-3">
+            <div class="bg-surface-container dark:bg-dark-bg p-2 rounded-xl text-center">
+                <span class="material-symbols-outlined text-primary text-base">volume_up</span>
+                <div class="font-data-display text-xs font-bold text-on-surface dark:text-white">${venue.dbAvg} dB</div>
+            </div>
+            <div class="bg-surface-container dark:bg-dark-bg p-2 rounded-xl text-center">
+                <span class="material-symbols-outlined text-secondary text-base">wifi</span>
+                <div class="font-data-display text-xs font-bold text-on-surface dark:text-white">${venue.wifiSpeed}M</div>
+            </div>
+            <div class="bg-surface-container dark:bg-dark-bg p-2 rounded-xl text-center">
+                <span class="material-symbols-outlined text-secondary text-base">power</span>
+                <div class="font-data-display text-xs font-bold text-on-surface dark:text-white">${venue.outletCoverage}%</div>
+            </div>
+        </div>
+
+        <button id="map-btn-view-details" class="w-full bg-primary hover:bg-primary-container text-white py-2 rounded-xl text-xs font-semibold transition-colors">
+            View Details
+        </button>
+    `;
+
+    document.getElementById('map-btn-view-details').addEventListener('click', () => {
+        sheet.classList.add('hidden');
+        openVenueDetail(venue.id);
+    });
+
+    document.getElementById('btn-close-map-sheet').addEventListener('click', () => {
+        sheet.classList.add('hidden');
+    });
+
+    sheet.classList.remove('hidden');
+}
+
+// Modal Filters Logic
+function initFilterModal() {
+    const modal = document.getElementById('filter-modal');
+    const openBtn = document.getElementById('btn-open-filter-modal');
+    const closeBtn = document.getElementById('btn-close-filter-modal');
+    const applyBtn = document.getElementById('btn-apply-modal-filters');
+    const resetBtn = document.getElementById('btn-reset-modal-filters');
+
+    const dbSlider = document.getElementById('filter-db-slider');
+    const dbDisplay = document.getElementById('filter-db-display');
+    const wifiSlider = document.getElementById('filter-wifi-slider');
+    const wifiDisplay = document.getElementById('filter-wifi-display');
+    const outletsSlider = document.getElementById('filter-outlets-slider');
+    const outletsDisplay = document.getElementById('filter-outlets-display');
+
+    if (dbSlider && dbDisplay) dbSlider.addEventListener('input', (e) => dbDisplay.textContent = `${e.target.value} dB`);
+    if (wifiSlider && wifiDisplay) wifiSlider.addEventListener('input', (e) => wifiDisplay.textContent = `${e.target.value} Mbps`);
+    if (outletsSlider && outletsDisplay) outletsSlider.addEventListener('input', (e) => outletsDisplay.textContent = `${e.target.value}%`);
+
+    if (openBtn) openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+    if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+    if (applyBtn) {
+        applyBtn.addEventListener('click', () => {
+            state.filters.maxDb = parseInt(dbSlider.value);
+            state.filters.minWifi = parseInt(wifiSlider.value);
+            state.filters.minOutlets = parseInt(outletsSlider.value);
+
+            const checkedAmenities = Array.from(document.querySelectorAll('.amenity-checkbox:checked')).map(c => c.value);
+            state.filters.amenities = checkedAmenities;
+
+            updateActiveFilterBadge();
+            renderVenuesGrid();
+            modal.classList.add('hidden');
+        });
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            dbSlider.value = 55;
+            dbDisplay.textContent = '55 dB';
+            wifiSlider.value = 0;
+            wifiDisplay.textContent = '0 Mbps';
+            outletsSlider.value = 0;
+            outletsDisplay.textContent = '0%';
+            document.querySelectorAll('.amenity-checkbox').forEach(c => c.checked = false);
+
+            state.filters = { maxDb: 55, minWifi: 0, minOutlets: 0, amenities: [] };
+            updateActiveFilterBadge();
+            renderVenuesGrid();
+        });
+    }
+
+    const resetFilterBtn = document.getElementById('btn-reset-filters');
+    if (resetFilterBtn && resetBtn) {
+        resetFilterBtn.addEventListener('click', () => {
+            resetBtn.click();
+        });
+    }
+}
+
+function updateActiveFilterBadge() {
+    const badge = document.getElementById('active-filter-count');
+    if (!badge) return;
+    let count = 0;
+    if (state.filters.maxDb < 65) count++;
+    if (state.filters.minWifi > 0) count++;
+    if (state.filters.minOutlets > 0) count++;
+    count += state.filters.amenities.length;
+
+    if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+}
+
+// Check-In Session Modal & Timer
+function initCheckInModal() {
+    const modal = document.getElementById('checkin-modal');
+    const cancelBtn = document.getElementById('btn-cancel-checkin');
+    const confirmBtn = document.getElementById('btn-confirm-checkin');
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            stopCheckInTimer();
+            modal.classList.add('hidden');
+        });
+    }
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => {
+            confirmBtn.textContent = 'Session Active';
+            confirmBtn.classList.add('bg-emerald-600');
+        });
+    }
+}
+
+function openCheckInModal(venue) {
+    state.checkInVenueId = venue.id;
+    const nameElem = document.getElementById('checkin-venue-name');
+    if (nameElem) nameElem.textContent = venue.name;
+    document.getElementById('checkin-modal').classList.remove('hidden');
+    startCheckInTimer();
+}
+
+function startCheckInTimer() {
+    stopCheckInTimer();
+    state.checkInSeconds = 0;
+    const timerElem = document.getElementById('checkin-timer');
+
+    state.checkInTimerInterval = setInterval(() => {
+        state.checkInSeconds++;
+        const hrs = String(Math.floor(state.checkInSeconds / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((state.checkInSeconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(state.checkInSeconds % 60).padStart(2, '0');
+        if (timerElem) timerElem.textContent = `${hrs}:${mins}:${secs}`;
+    }, 1000);
+}
+
+function stopCheckInTimer() {
+    if (state.checkInTimerInterval) {
+        clearInterval(state.checkInTimerInterval);
+        state.checkInTimerInterval = null;
+    }
+}
+
+// Live Sound Check Tool (Microphone API & Spectrum Visualizer)
+function initSoundCheck() {
+    const canvas = document.getElementById('sound-spectrum-canvas');
+    const dbValElem = document.getElementById('soundcheck-db-val');
+    const statusPill = document.getElementById('soundcheck-status-pill');
+    const micBtn = document.getElementById('btn-start-mic-test');
+    const simBtn = document.getElementById('btn-simulate-sound');
+
+    if (!canvas || !dbValElem || !statusPill || !micBtn || !simBtn) return;
+
+    let isMicActive = false;
+    let animId = null;
+
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.clientWidth * window.devicePixelRatio || 600;
+    canvas.height = canvas.clientHeight * window.devicePixelRatio || 200;
+
+    simBtn.addEventListener('click', () => {
+        if (isMicActive) stopMic();
+        startSimulation();
+    });
+
+    micBtn.addEventListener('click', async () => {
+        if (isMicActive) {
+            stopMic();
+            micBtn.innerHTML = '<span class="material-symbols-outlined">mic</span><span>Start Microphone Sound Check</span>';
+            isMicActive = false;
+        } else {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                state.micStream = stream;
+                state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = state.audioContext.createMediaStreamSource(stream);
+                state.analyser = state.audioContext.createAnalyser();
+                state.analyser.fftSize = 64;
+                source.connect(state.analyser);
+
+                isMicActive = true;
+                micBtn.innerHTML = '<span class="material-symbols-outlined">mic_off</span><span>Stop Microphone Test</span>';
+                renderMicSpectrum();
+            } catch (err) {
+                alert('Microphone access denied or unavailable. Running acoustic simulation instead.');
+                startSimulation();
+            }
+        }
+    });
+
+    function stopMic() {
+        if (state.micStream) {
+            state.micStream.getTracks().forEach(t => t.stop());
+            state.micStream = null;
+        }
+        if (animId) cancelAnimationFrame(animId);
+    }
+
+    function renderMicSpectrum() {
+        if (!state.analyser) return;
+
+        const bufferLength = state.analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        function draw() {
+            animId = requestAnimationFrame(draw);
+            state.analyser.getByteFrequencyData(dataArray);
+
+            let sum = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                sum += dataArray[i];
+            }
+            const avg = sum / bufferLength;
+            const dbEstimate = Math.min(80, Math.max(30, Math.round(30 + (avg / 255) * 45)));
+
+            dbValElem.textContent = dbEstimate;
+            updateDbStatusPill(dbEstimate);
+            drawCanvasBars(dataArray, bufferLength);
+        }
+
+        draw();
+    }
+
+    function startSimulation() {
+        if (animId) cancelAnimationFrame(animId);
+
+        let time = 0;
+        function drawSim() {
+            animId = requestAnimationFrame(drawSim);
+            time += 0.05;
+
+            const fakeDb = Math.round(38 + Math.sin(time) * 4 + Math.cos(time * 0.5) * 3);
+            dbValElem.textContent = fakeDb;
+            updateDbStatusPill(fakeDb);
+
+            const simData = new Uint8Array(32);
+            for (let i = 0; i < 32; i++) {
+                simData[i] = Math.max(10, Math.round(40 + Math.sin(time + i * 0.2) * 35));
+            }
+
+            drawCanvasBars(simData, 32);
+        }
+
+        drawSim();
+    }
+
+    function drawCanvasBars(dataArray, length) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const barWidth = (canvas.width / length) * 0.7;
+        let x = 0;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const barColor = isDark ? '#68dba9' : '#006948';
+
+        for (let i = 0; i < length; i++) {
+            const barHeight = (dataArray[i] / 255) * canvas.height * 0.85;
+
+            ctx.fillStyle = barColor;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = barColor;
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+
+            x += barWidth + (canvas.width / length) * 0.3;
+        }
+    }
+
+    function updateDbStatusPill(db) {
+        if (db < 40) {
+            statusPill.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Pin-drop Silent (&lt;40 dB)';
+        } else if (db < 48) {
+            statusPill.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Library-like Hush (40-48 dB)';
+        } else {
+            statusPill.innerHTML = '<span class="w-2 h-2 rounded-full bg-yellow-500"></span> Moderate Ambient Noise (&gt;48 dB)';
+        }
+    }
+}
