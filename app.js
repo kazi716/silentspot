@@ -145,9 +145,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initSoundCheck();
     initAmbientAudio();
     initContributionModal();
+    initLeafletMap();
     
-    // Initial distance calculation
-    setLocation(state.currentLocation, state.currentLat, state.currentLng);
+    // Initial data fetch
+    loadRealVenues(state.currentLat, state.currentLng, state.currentLocation);
     updateSavedBadge();
 });
 
