@@ -10,190 +10,8 @@ const PRESET_LOCATIONS = [
     { name: "Upper East Side, NY", lat: 40.7794, lng: -73.9632 }
 ];
 
-// Initial Venues Database
-const VENUES = [
-    {
-        id: "chapter-house-cafe",
-        name: "The Chapter House Café",
-        type: "Quiet Café",
-        category: "cafe",
-        address: "123 Hudson St, New York, NY",
-        neighborhood: "Lower Manhattan, NY",
-        distance: "0.3 mi",
-        calculatedDistance: 0.3,
-        lat: 40.7185,
-        lng: -74.0080,
-        dbAvg: 42,
-        dbStatus: "Library-like hush. Ideal for deep focus.",
-        wifiSpeed: 145,
-        wifiStatus: "Stable & Fiber-backed",
-        outletCoverage: 90,
-        outletStatus: "Every table has access",
-        seating: "Ergonomic Seating",
-        seatingDesc: "Large shared oak tables & padded ergonomic chairs available.",
-        stayPolicy: "3 hr+ Stay Friendly",
-        stayPolicyDesc: "No purchase-per-hour pressure. The staff respects focused work sessions.",
-        occupancy: "Low",
-        occupancyColor: "bg-emerald-500",
-        hours: "Open until 8:00 PM",
-        image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
-        amenities: ["Abundant Natural Light", "Ergonomic Chairs", "Call-friendly Patio", "Printing Services"],
-        feedback: [
-            { quote: "Perfect for deep work on Tuesday mornings. Extremely quiet.", author: "Sarah T., Designer" },
-            { quote: "Great coffee, but seating fills up by 10 AM on weekends.", author: "Mike R., Developer" }
-        ]
-    },
-    {
-        id: "foundry-library",
-        name: "Foundry Library & Coworking",
-        type: "Coworking Space",
-        category: "coworking",
-        address: "500 5th Ave, New York, NY",
-        neighborhood: "Midtown West, NY",
-        distance: "0.8 mi",
-        calculatedDistance: 0.8,
-        lat: 40.7535,
-        lng: -73.9810,
-        dbAvg: 38,
-        dbStatus: "Absolute silence zone. Strict no-talking policy.",
-        wifiSpeed: 250,
-        wifiStatus: "Gigabit Ultra-Fast",
-        outletCoverage: 100,
-        outletStatus: "Built-in AC & USB-C ports on all carrels",
-        seating: "Standing & Task Chairs",
-        seatingDesc: "Height-adjustable standing desks and Herman Miller Aeron chairs.",
-        stayPolicy: "All Day Access",
-        stayPolicyDesc: "Open to public for single-day pass or quiet study passes.",
-        occupancy: "Medium",
-        occupancyColor: "bg-yellow-400",
-        hours: "Open 24 Hours",
-        image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80",
-        amenities: ["Standing Desks", "Quiet Zone Only", "High-speed Scanner", "Ergonomic Chairs"],
-        feedback: [
-            { quote: "Best venue in the city if you have a tight deadline. Pure concentration.", author: "Elena M., Architect" }
-        ]
-    },
-    {
-        id: "silent-spire",
-        name: "The Silent Spire Reading Room",
-        type: "Library",
-        category: "library",
-        address: "70 Washington Sq S, New York, NY",
-        neighborhood: "Greenwich Village, NY",
-        distance: "0.5 mi",
-        calculatedDistance: 0.5,
-        lat: 40.7295,
-        lng: -73.9970,
-        dbAvg: 35,
-        dbStatus: "Whisper-quiet sanctuary with acoustic wall baffles.",
-        wifiSpeed: 180,
-        wifiStatus: "High Speed Campus Network",
-        outletCoverage: 85,
-        outletStatus: "Under-desk power strips",
-        seating: "Reading Lounges",
-        seatingDesc: "Comfortable leather armchairs and wide wood research benches.",
-        stayPolicy: "Unlimited Stay",
-        stayPolicyDesc: "Free public access with quiet study protocol.",
-        occupancy: "Low",
-        occupancyColor: "bg-emerald-500",
-        hours: "Open until 10:00 PM",
-        image: "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=1200&q=80",
-        amenities: ["Abundant Natural Light", "Ergonomic Chairs", "Silent Study Pods"],
-        feedback: [
-            { quote: "Sublime atmosphere. High ceilings, soothing acoustic dampening.", author: "David K., Author" }
-        ]
-    },
-    {
-        id: "nook-and-bean",
-        name: "Nook & Bean Artisanal Roasters",
-        type: "Quiet Café",
-        category: "cafe",
-        address: "45 Montague St, Brooklyn, NY",
-        neighborhood: "Brooklyn Heights, NY",
-        distance: "1.2 mi",
-        calculatedDistance: 1.2,
-        lat: 40.6945,
-        lng: -73.9930,
-        dbAvg: 46,
-        dbStatus: "Soft ambient jazz. Warm focus environment.",
-        wifiSpeed: 120,
-        wifiStatus: "Fast Guest Wi-Fi",
-        outletCoverage: 75,
-        outletStatus: "Outlets along wall booths",
-        seating: "Plush Leather Booths",
-        seatingDesc: "Spacious booths with soft lighting and USB charging.",
-        stayPolicy: "2-3 hr Friendly",
-        stayPolicyDesc: "Laptop friendly seating areas near the garden window.",
-        occupancy: "Medium",
-        occupancyColor: "bg-yellow-400",
-        hours: "Open until 7:00 PM",
-        image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=80",
-        amenities: ["Call-friendly Patio", "Natural Light", "Specialty Coffee Bar"],
-        feedback: [
-            { quote: "The outdoor patio is great for taking phone calls without annoying others.", author: "James P., Product Manager" }
-        ]
-    },
-    {
-        id: "metropolitan-vault",
-        name: "Metropolitan Research Vault",
-        type: "Library",
-        category: "library",
-        address: "1000 5th Ave, New York, NY",
-        neighborhood: "Upper East Side, NY",
-        distance: "2.1 mi",
-        calculatedDistance: 2.1,
-        lat: 40.7794,
-        lng: -73.9632,
-        dbAvg: 32,
-        dbStatus: "Pin-drop quiet. Zero external noise intrusion.",
-        wifiSpeed: 300,
-        wifiStatus: "Fiber Optic Direct",
-        outletCoverage: 95,
-        outletStatus: "Dedicated power per seat",
-        seating: "Individual Study Carrels",
-        seatingDesc: "Private partitioned desks with lamp and double outlets.",
-        stayPolicy: "Full Day Pass",
-        stayPolicyDesc: "Visitor registration required at entrance. Highly respected silence.",
-        occupancy: "Low",
-        occupancyColor: "bg-emerald-500",
-        hours: "Open until 6:00 PM",
-        image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1200&q=80",
-        amenities: ["Ergonomic Chairs", "Printing Services", "Silent Study Pods"],
-        feedback: [
-            { quote: "Unmatched study environment if you need to read 200 pages in peace.", author: "Chloe L., Researcher" }
-        ]
-    },
-    {
-        id: "komorebi-garden",
-        name: "Komorebi Zen Workspace",
-        type: "Coworking Space",
-        category: "coworking",
-        address: "180 Spring St, New York, NY",
-        neighborhood: "SoHo, NY",
-        distance: "0.6 mi",
-        calculatedDistance: 0.6,
-        lat: 40.7250,
-        lng: -74.0025,
-        dbAvg: 40,
-        dbStatus: "Biophilic indoor garden with soft water fountain hum.",
-        wifiSpeed: 210,
-        wifiStatus: "Ultra Stable Mesh",
-        outletCoverage: 90,
-        outletStatus: "Wireless charging pads + AC",
-        seating: "Japanese Low Benches & Ergonomic Chairs",
-        seatingDesc: "Custom bamboo desks, posture stools, and ergonomic chairs.",
-        stayPolicy: "3 hr+ Stay Friendly",
-        stayPolicyDesc: "Relaxed atmosphere with herbal tea bar included.",
-        occupancy: "Low",
-        occupancyColor: "bg-emerald-500",
-        hours: "Open until 9:00 PM",
-        image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80",
-        amenities: ["Abundant Natural Light", "Ergonomic Chairs", "Call-friendly Patio"],
-        feedback: [
-            { quote: "The indoor plants and quiet ambient fountain make focus effortless.", author: "Kenji S., Developer" }
-        ]
-    }
-];
+// Dynamic Venues Array — populated from OpenStreetMap Overpass API
+let VENUES = [];
 
 // App State
 const state = {
@@ -202,7 +20,7 @@ const state = {
     currentLat: 40.7185,
     currentLng: -74.0080,
     maxDistanceRadius: 10.0,
-    savedVenueIds: JSON.parse(localStorage.getItem('silentspot_saved_venues') || '["chapter-house-cafe"]'),
+    savedVenueIds: JSON.parse(localStorage.getItem('silentspot_saved_venues') || '[]'),
     activeQuickFilter: 'all',
     searchQuery: '',
     filters: {
@@ -250,9 +68,9 @@ function getUserLevel(minutes) {
 }
 
 function generateVibeSummary(venue) {
-    const isQuiet = venue.noiseDb <= 45;
-    const isFast = venue.wifiMbps >= 100;
-    const isPower = venue.powerOutlets >= 70;
+    const isQuiet = venue.dbAvg <= 45;
+    const isFast = venue.wifiSpeed >= 100;
+    const isPower = venue.outletCoverage >= 70;
     
     let vibes = [];
     if (isQuiet && isFast) vibes.push("Ultimate productivity sanctuary");
@@ -260,8 +78,8 @@ function generateVibeSummary(venue) {
     else if (isFast) vibes.push("High-speed hub with energetic chatter");
     else vibes.push("Casual spot for light reading");
     
-    if (venue.amenities.includes("Ergonomic Chairs")) vibes[0] += " & great seating.";
-    else if (venue.amenities.includes("Abundant Natural Light")) vibes[0] += " drenched in sunlight.";
+    if (venue.amenities && venue.amenities.includes("Ergonomic Chairs")) vibes[0] += " & great seating.";
+    else if (venue.amenities && venue.amenities.includes("Abundant Natural Light")) vibes[0] += " drenched in sunlight.";
     else if (isPower) vibes[0] += " with endless power.";
     else vibes[0] += ".";
     
@@ -326,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCheckInModal();
     initSoundCheck();
     initAmbientAudio();
+    initContributionModal();
     
     // Initial distance calculation
     setLocation(state.currentLocation, state.currentLat, state.currentLng);
@@ -344,132 +163,67 @@ function calcHaversineDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
-// Generate Realistic Quiet Venues for ANY Location Shared or Clicked
-function generateVenuesForLocation(lat, lng, locationName) {
-    const cleanName = locationName.split(',')[0].trim();
-    const locId = cleanName.toLowerCase().replace(/[^a-z0-9]/g, '-');
-
-    const templateSpots = [
-        {
-            id: `dyn-vault-${locId}-1`,
-            name: `${cleanName} Central Reading Vault`,
-            type: "Library",
-            category: "library",
-            address: `Central District, ${cleanName}`,
-            neighborhood: `${cleanName}`,
-            lat: lat + 0.0032,
-            lng: lng - 0.0025,
-            dbAvg: 34,
-            dbStatus: "Acoustically soundproofed research hall.",
-            wifiSpeed: 280,
-            wifiStatus: "High Speed Fiber Direct",
-            outletCoverage: 95,
-            outletStatus: "Outlets at every study desk",
-            seating: "Study Carrels",
-            seatingDesc: "Spacious individual desks with reading lamps.",
-            stayPolicy: "Full Day Access",
-            stayPolicyDesc: "Open to public for quiet study.",
-            occupancy: "Low",
-            occupancyColor: "bg-emerald-500",
-            hours: "Open until 9:00 PM",
-            image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80",
-            amenities: ["Ergonomic Chairs", "Abundant Natural Light", "Printing Services"],
-            feedback: [
-                { quote: "Super quiet space, perfect for focus.", author: "Local Scholar" }
-            ]
-        },
-        {
-            id: `dyn-cafe-${locId}-2`,
-            name: `The Chapter & Grind Café`,
-            type: "Quiet Café",
-            category: "cafe",
-            address: `Main Ave, ${cleanName}`,
-            neighborhood: `${cleanName}`,
-            lat: lat - 0.0038,
-            lng: lng + 0.0029,
-            dbAvg: 41,
-            dbStatus: "Gentle low hum. Great focus atmosphere.",
-            wifiSpeed: 155,
-            wifiStatus: "Stable Guest Network",
-            outletCoverage: 85,
-            outletStatus: "Outlets along perimeter wall",
-            seating: "Ergonomic Chairs",
-            seatingDesc: "Comfortable padded seating and wide shared tables.",
-            stayPolicy: "3 hr+ Stay Friendly",
-            stayPolicyDesc: "Laptop friendly seating and respectful staff.",
-            occupancy: "Low",
-            occupancyColor: "bg-emerald-500",
-            hours: "Open until 8:00 PM",
-            image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80",
-            amenities: ["Abundant Natural Light", "Call-friendly Patio", "Ergonomic Chairs"],
-            feedback: [
-                { quote: "Ideal place for morning coding sessions.", author: "Remote Dev" }
-            ]
-        },
-        {
-            id: `dyn-lab-${locId}-3`,
-            name: `${cleanName} Serenity Work Lab`,
-            type: "Coworking Space",
-            category: "coworking",
-            address: `Innovation Hub, ${cleanName}`,
-            neighborhood: `${cleanName}`,
-            lat: lat + 0.0048,
-            lng: lng + 0.0042,
-            dbAvg: 37,
-            dbStatus: "Strict silent focus floor.",
-            wifiSpeed: 320,
-            wifiStatus: "Gigabit Mesh",
-            outletCoverage: 100,
-            outletStatus: "Built-in AC & USB ports",
-            seating: "Standing & Task Chairs",
-            seatingDesc: "Height adjustable standing desks.",
-            stayPolicy: "Day Pass / Flexible",
-            stayPolicyDesc: "Quiet protocol strictly enforced.",
-            occupancy: "Medium",
-            occupancyColor: "bg-yellow-400",
-            hours: "Open 24/7",
-            image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80",
-            amenities: ["Standing Desks", "Quiet Zone Only", "Printing Services"],
-            feedback: [
-                { quote: "Fast Wi-Fi and zero noise distractions.", author: "Designer" }
-            ]
-        },
-        {
-            id: `dyn-nook-${locId}-4`,
-            name: `Acoustic Nook & Roastery`,
-            type: "Quiet Café",
-            category: "cafe",
-            address: `South St, ${cleanName}`,
-            neighborhood: `${cleanName}`,
-            lat: lat - 0.0022,
-            lng: lng - 0.0048,
-            dbAvg: 44,
-            dbStatus: "Soft acoustic background music.",
-            wifiSpeed: 140,
-            wifiStatus: "Fast Wi-Fi",
-            outletCoverage: 80,
-            outletStatus: "Booths equipped with outlets",
-            seating: "Leather Booths",
-            seatingDesc: "Spacious booths with soft lighting.",
-            stayPolicy: "2-3 hr Friendly",
-            stayPolicyDesc: "Staff respects focused work.",
-            occupancy: "Low",
-            occupancyColor: "bg-emerald-500",
-            hours: "Open until 7:30 PM",
-            image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=80",
-            amenities: ["Call-friendly Patio", "Natural Light"],
-            feedback: [
-                { quote: "Cozy atmosphere with great seating.", author: "Freelancer" }
-            ]
+// Load REAL venues from OpenStreetMap Overpass API
+async function loadRealVenues(lat, lng, locationName) {
+    const loadingEl = document.getElementById('venues-loading');
+    const gridEl = document.getElementById('venues-grid');
+    const bannerEl = document.getElementById('data-source-banner');
+    
+    // Show loading skeleton
+    if (loadingEl) loadingEl.classList.remove('hidden');
+    if (gridEl) gridEl.innerHTML = '';
+    
+    try {
+        const data = await fetchRealVenues(lat, lng, 3000);
+        
+        if (data && data.elements && data.elements.length > 0) {
+            // Map OSM data to venue objects, filter out unnamed places
+            const newVenues = data.elements
+                .map((el, i) => mapOSMToVenue(el, i, locationName))
+                .filter(v => v !== null);
+            
+            if (newVenues.length > 0) {
+                VENUES = newVenues;
+                
+                // Show success banner
+                if (bannerEl) {
+                    bannerEl.className = 'mb-4 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+                    bannerEl.innerHTML = '<span class="material-symbols-outlined text-sm">verified</span> Showing <strong>' + newVenues.length + ' real places</strong> from OpenStreetMap near ' + locationName;
+                    bannerEl.classList.remove('hidden');
+                }
+            } else {
+                // No named venues found — use demo
+                loadDemoVenues(lat, lng, locationName, bannerEl);
+            }
+        } else {
+            // API returned no results
+            loadDemoVenues(lat, lng, locationName, bannerEl);
         }
-    ];
+    } catch (err) {
+        console.warn('Overpass API error:', err);
+        loadDemoVenues(lat, lng, locationName, bannerEl);
+    }
+    
+    // Hide loading skeleton
+    if (loadingEl) loadingEl.classList.add('hidden');
+    
+    // Recalculate distances and render
+    setLocation(locationName, lat, lng);
+}
 
-    templateSpots.forEach(spot => {
-        const exists = VENUES.some(v => v.id === spot.id);
-        if (!exists) {
-            VENUES.push(spot);
-        }
-    });
+function loadDemoVenues(lat, lng, locationName, bannerEl) {
+    VENUES = DEMO_VENUES.map((v, i) => ({
+        ...v,
+        lat: lat + (Math.random() - 0.5) * 0.01,
+        lng: lng + (Math.random() - 0.5) * 0.01,
+        neighborhood: locationName
+    }));
+    
+    if (bannerEl) {
+        bannerEl.className = 'mb-4 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
+        bannerEl.innerHTML = '<span class="material-symbols-outlined text-sm">info</span> Showing <strong>demo venues</strong> — no real places found nearby or API unavailable.';
+        bannerEl.classList.remove('hidden');
+    }
 }
 
 // Location Selector System with Geocoding
@@ -497,8 +251,7 @@ function initLocationModal() {
 
     if (discoverHereBtn) {
         discoverHereBtn.addEventListener('click', () => {
-            generateVenuesForLocation(state.currentLat, state.currentLng, state.currentLocation);
-            setLocation(state.currentLocation, state.currentLat, state.currentLng);
+            loadRealVenues(state.currentLat, state.currentLng, state.currentLocation);
         });
     }
 
@@ -541,8 +294,7 @@ function initLocationModal() {
 
                     gpsBtnText.textContent = 'GPS Found!';
                     setTimeout(() => {
-                        generateVenuesForLocation(lat, lng, locationName);
-                        setLocation(locationName, lat, lng);
+                        loadRealVenues(lat, lng, locationName);
                         modal.classList.add('hidden');
                         gpsBtnText.textContent = 'Detect My Current GPS Location';
                         gpsBtn.disabled = false;
@@ -631,8 +383,7 @@ function renderCustomLocationsList(locationsArray) {
             const lat = parseFloat(btn.getAttribute('data-lat'));
             const lng = parseFloat(btn.getAttribute('data-lng'));
             
-            generateVenuesForLocation(lat, lng, name);
-            setLocation(name, lat, lng);
+            loadRealVenues(lat, lng, name);
             document.getElementById('location-modal').classList.add('hidden');
         });
     });
@@ -1393,6 +1144,10 @@ function openVenueDetail(venueId) {
                         <span>Check In / Start Session</span>
                     </button>
                     <p class="text-[11px] text-secondary dark:text-gray-400 mt-2">Track live dB and focus session time</p>
+                    <button id="btn-open-contribute" class="w-full mt-3 bg-surface-container hover:bg-surface-container-high text-on-surface dark:bg-dark-bg dark:text-gray-200 dark:hover:bg-dark-surface-border font-headline-sm text-sm font-semibold py-3 rounded-xl border border-outline-variant/30 dark:border-dark-surface-border transition-all flex items-center justify-center gap-2" onclick="openContributionModal('${venue.id}')">
+                        <span class="material-symbols-outlined text-lg">edit_square</span>
+                        <span>Contribute Info</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1483,8 +1238,7 @@ function initLeafletMap() {
             console.warn('Reverse geocoding error:', err);
         }
 
-        generateVenuesForLocation(lat, lng, locationName);
-        setLocation(locationName, lat, lng);
+        loadRealVenues(lat, lng, locationName);
     });
 }
 
@@ -1857,4 +1611,57 @@ function initSoundCheck() {
             statusPill.innerHTML = '<span class="w-2 h-2 rounded-full bg-yellow-500"></span> Moderate Ambient Noise (&gt;48 dB)';
         }
     }
+}
+
+// User Contribution Logic
+function initContributionModal() {
+    const modal = document.getElementById('contribution-modal');
+    const closeBtn = document.getElementById('btn-close-contribution');
+    const cancelBtn = document.getElementById('btn-cancel-contribution');
+    const form = document.getElementById('contribution-form');
+
+    if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    if (cancelBtn) cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const venueId = document.getElementById('contrib-venue-id').value;
+            
+            const photoUrl = document.getElementById('contrib-photo').value.trim();
+            const wifiSpeed = document.getElementById('contrib-wifi').value;
+            const reviewQuote = document.getElementById('contrib-review').value.trim();
+
+            if (photoUrl) saveUserContribution(venueId, 'photo', photoUrl);
+            if (wifiSpeed) saveUserContribution(venueId, 'wifiSpeed', parseInt(wifiSpeed, 10));
+            if (reviewQuote) saveUserContribution(venueId, 'review', { quote: reviewQuote, author: 'SilentSpot User' });
+
+            modal.classList.add('hidden');
+            form.reset();
+            
+            // Show toast and reload venues to apply changes
+            alert('Thank you! Your contribution has been saved locally.');
+            renderVenuesGrid();
+            
+            // Update open detail view if active
+            if (state.currentTab === 'details' && state.selectedVenueId === venueId) {
+                openVenueDetail(venueId);
+            }
+        });
+    }
+}
+
+function openContributionModal(venueId) {
+    const modal = document.getElementById('contribution-modal');
+    if (!modal) return;
+    
+    document.getElementById('contrib-venue-id').value = venueId;
+    
+    const venue = VENUES.find(v => v.id === venueId);
+    if (venue) {
+        document.getElementById('contribution-venue-name').textContent = venue.name;
+    }
+    
+    document.getElementById('contribution-form').reset();
+    modal.classList.remove('hidden');
 }
