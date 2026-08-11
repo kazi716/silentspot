@@ -215,8 +215,8 @@ async function loadRealVenues(lat, lng, locationName) {
 function loadDemoVenues(lat, lng, locationName, bannerEl) {
     VENUES = DEMO_VENUES.map((v, i) => ({
         ...v,
-        lat: lat + (Math.random() - 0.5) * 0.01,
-        lng: lng + (Math.random() - 0.5) * 0.01,
+        lat: Number(lat) + (Math.random() - 0.5) * 0.01,
+        lng: Number(lng) + (Math.random() - 0.5) * 0.01,
         neighborhood: locationName
     }));
     
