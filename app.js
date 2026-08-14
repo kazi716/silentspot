@@ -1142,7 +1142,7 @@ function openVenueDetail(venueId) {
                             <p class="text-xs text-secondary dark:text-gray-400">${venue.neighborhood} (${venue.distance} away)</p>
                         </div>
                     </div>
-                    <button class="px-4 py-2 bg-primary/10 dark:bg-primary-fixed-dim/20 text-primary dark:text-primary-fixed-dim rounded-xl text-xs font-semibold hover:bg-primary/20 transition-colors shrink-0 flex items-center gap-1">
+                    <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${venue.lat},${venue.lng}', '_blank')" class="px-4 py-2 bg-primary/10 dark:bg-primary-fixed-dim/20 text-primary dark:text-primary-fixed-dim rounded-xl text-xs font-semibold hover:bg-primary/20 transition-colors shrink-0 flex items-center gap-1">
                         <span class="material-symbols-outlined text-base">directions</span>
                         Get Directions
                     </button>
