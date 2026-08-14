@@ -325,8 +325,7 @@ out center body;`;
         const response = await fetch('https://overpass-api.de/api/interpreter', {
             method: 'POST',
             headers: {
-                'Content-Type': 'text/plain',
-                'User-Agent': 'SilentSpot/1.0'
+                'Content-Type': 'text/plain'
             },
             body: query
         });
