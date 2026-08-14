@@ -43,7 +43,8 @@ const state = {
     activeAmbientTrack: null,
     ambientNodes: null,
     ambientGain: null,
-    totalFocusMinutes: parseInt(localStorage.getItem('silentspot_focus_minutes') || '0', 10)
+    totalFocusMinutes: parseInt(localStorage.getItem('silentspot_focus_minutes') || '0', 10),
+    userName: localStorage.getItem('silentspot_username') || 'You'
 };
 
 // --- GAMIFICATION & AI VIBE LOGIC ---
@@ -91,9 +92,10 @@ function renderProfileView() {
     
     document.getElementById('profile-focus-minutes').textContent = state.totalFocusMinutes;
     document.getElementById('profile-level-name').textContent = currentLevel.name;
+    document.getElementById('profile-display-name-input').value = state.userName;
     
     const badge = document.getElementById('profile-level-badge');
-    badge.className = `w-24 h-24 rounded-full bg-gradient-to-br ${currentLevel.color} mx-auto flex items-center justify-center shadow-lg border-4 border-white dark:border-dark-surface-card mb-3`;
+    badge.className = `w-24 h-24 rounded-full bg-gradient-to-br ${currentLevel.color} mx-auto flex items-center justify-center shadow-lg border-4 border-white dark:border-dark-surface-card mb-3 transition-colors duration-500`;
     badge.innerHTML = `<span class="material-symbols-outlined text-5xl text-white">${currentLevel.icon}</span>`;
     
     const progressBar = document.getElementById('profile-progress-bar');
@@ -112,7 +114,7 @@ function renderProfileView() {
     const mockUsers = [
         { name: "Sarah K.", mins: 1240, level: "Zen Master" },
         { name: "Alex M.", mins: 850, level: "Deep Worker" },
-        { name: "You", mins: state.totalFocusMinutes, level: currentLevel.name, isUser: true },
+        { name: state.userName, mins: state.totalFocusMinutes, level: currentLevel.name, isUser: true },
         { name: "Jordan T.", mins: 320, level: "Deep Worker" },
         { name: "Emily R.", mins: 45, level: "Novice" }
     ];
@@ -129,6 +131,80 @@ function renderProfileView() {
                 </div>
             </div>
             <div class="font-data-display text-sm font-bold text-on-surface dark:text-white">${u.mins} <span class="text-[10px] font-normal text-secondary">mins</span></div>
+        </div>
+    `).join('');
+    
+    renderContributionsList();
+    renderProfileSavedGrid();
+}
+
+function renderContributionsList() {
+    const listEl = document.getElementById('contributions-list');
+    if (!listEl) return;
+    
+    const contributions = getAllContributions();
+    const venueIds = Object.keys(contributions);
+    
+    if (venueIds.length === 0) {
+        listEl.innerHTML = `
+            <div class="text-center p-8 bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-outline-variant/30 dark:border-dark-surface-border">
+                <span class="material-symbols-outlined text-4xl text-secondary opacity-50 mb-2">volunteer_activism</span>
+                <h4 class="font-bold text-on-surface dark:text-white mb-1">No Contributions Yet</h4>
+                <p class="text-xs text-secondary dark:text-gray-400 max-w-xs mx-auto">Help the community by updating noise levels or Wi-Fi speeds when you visit a venue.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    listEl.innerHTML = venueIds.map(id => {
+        const c = contributions[id];
+        const v = VENUES.find(venue => venue.id === id) || DEMO_VENUES.find(venue => venue.id === id);
+        const venueName = v ? v.name : 'Unknown Venue';
+        
+        return `
+            <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-4 rounded-2xl border border-outline-variant/30 dark:border-dark-surface-border flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <div>
+                    <div class="text-xs font-semibold text-primary dark:text-primary-fixed-dim mb-1">Contributed to</div>
+                    <h4 class="font-bold text-sm text-on-surface dark:text-white">${venueName}</h4>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    ${c.dbAvg ? `<span class="px-2 py-1 bg-surface-container text-[10px] font-bold rounded-lg text-on-surface dark:bg-dark-surface-border dark:text-gray-200">Noise: ${c.dbAvg} dB</span>` : ''}
+                    ${c.wifiSpeed ? `<span class="px-2 py-1 bg-surface-container text-[10px] font-bold rounded-lg text-on-surface dark:bg-dark-surface-border dark:text-gray-200">Wi-Fi: ${c.wifiSpeed} Mbps</span>` : ''}
+                    ${c.photo ? `<span class="px-2 py-1 bg-primary/10 text-[10px] font-bold rounded-lg text-primary dark:bg-primary-fixed-dim/20 dark:text-primary-fixed-dim">Added Photo</span>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderProfileSavedGrid() {
+    const gridEl = document.getElementById('profile-saved-grid');
+    if (!gridEl) return;
+    
+    const savedVenues = VENUES.filter(v => state.savedVenueIds.includes(v.id));
+    if (savedVenues.length === 0) {
+        gridEl.innerHTML = `
+            <div class="col-span-full text-center p-8 bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-outline-variant/30 dark:border-dark-surface-border">
+                <span class="material-symbols-outlined text-4xl text-secondary opacity-50 mb-2">bookmark_border</span>
+                <h4 class="font-bold text-on-surface dark:text-white mb-1">No Saved Venues</h4>
+                <p class="text-xs text-secondary dark:text-gray-400">Save places you want to visit later.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    gridEl.innerHTML = savedVenues.map(venue => `
+        <div class="venue-card cursor-pointer group bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl overflow-hidden border border-outline-variant/30 dark:border-dark-surface-border shadow-sm hover:shadow-md transition-all flex flex-col" onclick="openVenueDetails('${venue.id}')">
+            <div class="h-24 w-full bg-surface-container-high relative overflow-hidden shrink-0">
+                <img src="${venue.image}" alt="${venue.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            </div>
+            <div class="p-3 flex flex-col flex-grow">
+                <h3 class="font-bold text-on-surface dark:text-white text-sm line-clamp-1 mb-1 group-hover:text-primary transition-colors">${venue.name}</h3>
+                <div class="flex gap-2 text-[10px] text-secondary font-medium">
+                    <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">volume_up</span> ${venue.dbAvg}dB</span>
+                    <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">wifi</span> ${venue.wifiSpeed}M</span>
+                </div>
+            </div>
         </div>
     `).join('');
 }
@@ -470,6 +546,47 @@ function initNavigation() {
             renderVenuesGrid();
         });
     }
+
+    // Profile Sub-tabs
+    document.querySelectorAll('.profile-tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.profile-tab-btn').forEach(b => {
+                b.classList.remove('active', 'text-primary', 'dark:text-primary-fixed-dim', 'border-b-2', 'border-primary', 'dark:border-primary-fixed-dim');
+                b.classList.add('text-secondary');
+            });
+            e.target.classList.add('active', 'text-primary', 'dark:text-primary-fixed-dim', 'border-b-2', 'border-primary', 'dark:border-primary-fixed-dim');
+            e.target.classList.remove('text-secondary');
+
+            document.querySelectorAll('.profile-section').forEach(sec => {
+                sec.classList.remove('block');
+                sec.classList.add('hidden');
+            });
+            const targetId = e.target.getAttribute('data-target');
+            document.getElementById(targetId).classList.remove('hidden');
+            document.getElementById(targetId).classList.add('block');
+        });
+    });
+
+    // Profile Display Name Save
+    const nameInput = document.getElementById('profile-display-name-input');
+    const saveNameBtn = document.getElementById('btn-save-display-name');
+    if (nameInput && saveNameBtn) {
+        nameInput.addEventListener('input', () => {
+            saveNameBtn.classList.remove('hidden');
+        });
+        saveNameBtn.addEventListener('click', () => {
+            const newName = nameInput.value.trim() || 'You';
+            state.userName = newName;
+            localStorage.setItem('silentspot_username', newName);
+            saveNameBtn.classList.add('hidden');
+            renderProfileView(); // Re-render to update Leaderboard
+        });
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveNameBtn.click();
+            }
+        });
+    }
 }
 
 function switchTab(tabName) {
@@ -506,6 +623,8 @@ function switchTab(tabName) {
         renderComparisonTable();
     } else if (tabName === 'profile') {
         renderProfileView();
+    } else if (tabName === 'saved') {
+        renderSavedVenues();
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
