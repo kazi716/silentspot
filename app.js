@@ -1209,6 +1209,66 @@ function renderSavedVenues() {
     });
 }
 
+// Workspace Comparison Matrix Render
+function renderComparisonTable() {
+    const headerRow = document.getElementById('compare-table-header');
+    const body = document.getElementById('compare-table-body');
+    if (!headerRow || !body) return;
+
+    // Compare saved venues. If none, grab the top 3 visible ones as fallback.
+    let compareVenues = VENUES.filter(v => state.savedVenueIds.includes(v.id)).slice(0, 3);
+    if (compareVenues.length === 0) {
+        compareVenues = VENUES.slice(0, 3);
+    } else if (compareVenues.length === 1 && VENUES.length > 1) {
+        // Add one more just so there's a comparison
+        const fallback = VENUES.find(v => !state.savedVenueIds.includes(v.id));
+        if (fallback) compareVenues.push(fallback);
+    }
+
+    if (compareVenues.length === 0) {
+        headerRow.innerHTML = '<th class="p-4 text-center text-secondary">No venues available to compare</th>';
+        body.innerHTML = '';
+        return;
+    }
+
+    // Render Header
+    let headerHtml = `<th class="p-4 font-bold text-on-surface dark:text-white w-32 sticky left-0 bg-surface-container-lowest dark:bg-dark-surface-card z-10 border-r border-outline-variant/30 dark:border-dark-surface-border">Metrics</th>`;
+    compareVenues.forEach(v => {
+        headerHtml += `
+            <th class="p-4 min-w-[200px]">
+                <div class="h-24 w-full rounded-xl overflow-hidden mb-3">
+                    <img src="${v.image}" class="w-full h-full object-cover"/>
+                </div>
+                <div class="font-bold text-sm text-on-surface dark:text-white line-clamp-1">${v.name}</div>
+                <div class="text-[10px] text-primary dark:text-primary-fixed-dim mt-1">${v.type}</div>
+            </th>
+        `;
+    });
+    headerRow.innerHTML = headerHtml;
+
+    // Render Body Rows
+    const metrics = [
+        { label: 'Noise Level', key: 'dbAvg', format: val => `<span class="material-symbols-outlined text-sm align-middle mr-1 text-secondary">volume_up</span> ${val} dB` },
+        { label: 'Wi-Fi Speed', key: 'wifiSpeed', format: val => `<span class="material-symbols-outlined text-sm align-middle mr-1 text-secondary">wifi</span> ${val} Mbps` },
+        { label: 'Power Outlets', key: 'outletCoverage', format: val => `<span class="material-symbols-outlined text-sm align-middle mr-1 text-secondary">electrical_services</span> ${val}% Coverage` },
+        { label: 'Occupancy', key: 'occupancy', format: val => `<span class="font-semibold px-2 py-0.5 rounded-full text-[10px] ${val === 'High' ? 'bg-red-500/10 text-red-600 dark:text-red-400' : val === 'Medium' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'}">${val}</span>` },
+        { label: 'Stay Policy', key: 'stayPolicy', format: val => val },
+        { label: 'Amenities', key: 'amenities', format: val => val.join(' • ') }
+    ];
+
+    let bodyHtml = '';
+    metrics.forEach(metric => {
+        bodyHtml += `<tr class="hover:bg-surface-container-low/50 dark:hover:bg-dark-surface-border/50 transition-colors">`;
+        bodyHtml += `<td class="p-4 font-semibold text-secondary dark:text-gray-400 sticky left-0 bg-surface-container-lowest dark:bg-dark-surface-card z-10 border-r border-outline-variant/30 dark:border-dark-surface-border">${metric.label}</td>`;
+        compareVenues.forEach(v => {
+            bodyHtml += `<td class="p-4 text-on-surface dark:text-gray-200">${metric.format(v[metric.key])}</td>`;
+        });
+        bodyHtml += `</tr>`;
+    });
+
+    body.innerHTML = bodyHtml;
+}
+
 // Venue Detail View
 function openVenueDetail(venueId) {
     const venue = VENUES.find(v => v.id === venueId);
