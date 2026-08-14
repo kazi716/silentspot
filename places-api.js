@@ -321,23 +321,40 @@ async function fetchRealVenues(lat, lng, radiusMeters = 2000) {
 );
 out center body;`;
 
-    try {
-        const response = await fetch('https://overpass-api.de/api/interpreter', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain'
-            },
-            body: query
-        });
+    const endpoints = [
+        'https://overpass-api.de/api/interpreter',
+        'https://lz4.overpass-api.de/api/interpreter',
+        'https://z.overpass-api.de/api/interpreter',
+        'https://overpass.kumi.systems/api/interpreter'
+    ];
 
-        if (!response.ok) {
-            throw new Error(`Overpass API error: ${response.status}`);
+    let lastError = null;
+
+    for (const endpoint of endpoints) {
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: query
+            });
+
+            if (!response.ok) {
+                console.warn(`Overpass API error on ${endpoint}: ${response.status}`);
+                lastError = new Error(`Overpass API error: ${response.status}`);
+                continue; // try next endpoint
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.warn(`Error fetching from ${endpoint}:`, error);
+            lastError = error;
+            continue; // try next endpoint
         }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching venues from Overpass API:', error);
-        throw error;
     }
+
+    console.error('All Overpass API endpoints failed.');
+    throw lastError;
 }
