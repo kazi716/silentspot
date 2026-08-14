@@ -44,7 +44,9 @@ const state = {
     ambientNodes: null,
     ambientGain: null,
     totalFocusMinutes: parseInt(localStorage.getItem('silentspot_focus_minutes') || '0', 10),
-    userName: localStorage.getItem('silentspot_username') || 'You'
+    userName: localStorage.getItem('silentspot_username') || 'You',
+    isLoggedIn: localStorage.getItem('silentspot_is_logged_in') === 'true',
+    userEmail: localStorage.getItem('silentspot_user_email') || null
 };
 
 // --- GAMIFICATION & AI VIBE LOGIC ---
@@ -92,7 +94,16 @@ function renderProfileView() {
     
     document.getElementById('profile-focus-minutes').textContent = state.totalFocusMinutes;
     document.getElementById('profile-level-name').textContent = currentLevel.name;
-    document.getElementById('profile-display-name-input').value = state.userName;
+    
+    // New Header Fields
+    const greetingName = document.getElementById('profile-greeting-name');
+    if (greetingName) greetingName.textContent = state.userName;
+    
+    const emailDisplay = document.getElementById('profile-email-display');
+    if (emailDisplay) emailDisplay.textContent = state.userEmail || 'Guest';
+    
+    const avatar = document.getElementById('profile-avatar-initial');
+    if (avatar) avatar.textContent = state.userName.charAt(0).toUpperCase();
     
     const badge = document.getElementById('profile-level-badge');
     badge.className = `w-24 h-24 rounded-full bg-gradient-to-br ${currentLevel.color} mx-auto flex items-center justify-center shadow-lg border-4 border-white dark:border-dark-surface-card mb-3 transition-colors duration-500`;
@@ -208,12 +219,112 @@ function renderProfileSavedGrid() {
         </div>
     `).join('');
 }
+// --- AUTHENTICATION LOGIC ---
+
+function initAuthModal() {
+    const authModal = document.getElementById('auth-modal');
+    const closeBtn = document.getElementById('btn-close-auth');
+    const form = document.getElementById('auth-form');
+    const toggleBtn = document.getElementById('btn-auth-toggle');
+    const toggleText = document.getElementById('auth-toggle-text');
+    const submitBtn = document.getElementById('btn-auth-submit');
+    const nameGroup = document.getElementById('auth-name-group');
+    const title = document.getElementById('auth-title');
+    const subtitle = document.getElementById('auth-subtitle');
+    const errorText = document.getElementById('auth-error');
+    
+    let isLoginMode = true;
+
+    // Toggle Login / Register
+    toggleBtn.addEventListener('click', () => {
+        isLoginMode = !isLoginMode;
+        errorText.classList.add('hidden');
+        if (isLoginMode) {
+            nameGroup.classList.add('hidden');
+            title.textContent = 'Welcome Back';
+            subtitle.textContent = 'Sign in to access your profile and saved spots.';
+            submitBtn.textContent = 'Sign In';
+            toggleText.textContent = "Don't have an account?";
+            toggleBtn.textContent = 'Create one';
+        } else {
+            nameGroup.classList.remove('hidden');
+            title.textContent = 'Create Account';
+            subtitle.textContent = 'Join SilentSpot to save venues and track your focus.';
+            submitBtn.textContent = 'Sign Up';
+            toggleText.textContent = 'Already have an account?';
+            toggleBtn.textContent = 'Sign In';
+        }
+    });
+
+    closeBtn.addEventListener('click', () => {
+        authModal.classList.add('hidden');
+        // Revert to explore tab if user canceled login while trying to access protected tabs
+        if (state.currentTab === 'profile' || state.currentTab === 'saved') {
+            document.querySelector('[data-tab="explore"]').click();
+        }
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
+        const name = document.getElementById('auth-name').value;
+
+        // Simulated Login/Register Logic
+        if (!isLoginMode && name.trim() === '') {
+            errorText.textContent = 'Please enter a display name.';
+            errorText.classList.remove('hidden');
+            return;
+        }
+
+        // Success Simulate
+        state.isLoggedIn = true;
+        state.userEmail = email;
+        if (!isLoginMode) {
+            state.userName = name;
+            localStorage.setItem('silentspot_username', name);
+        }
+        
+        localStorage.setItem('silentspot_is_logged_in', 'true');
+        localStorage.setItem('silentspot_user_email', email);
+        
+        authModal.classList.add('hidden');
+        errorText.classList.add('hidden');
+        
+        // Refresh Current Tab View
+        if (state.currentTab === 'profile') {
+            renderProfileView();
+        } else if (state.currentTab === 'saved') {
+            renderSavedVenues();
+        }
+    });
+}
+
+function requireAuth(callback) {
+    if (state.isLoggedIn) {
+        callback();
+    } else {
+        document.getElementById('auth-modal').classList.remove('hidden');
+    }
+}
+
+function handleLogout() {
+    state.isLoggedIn = false;
+    state.userEmail = null;
+    localStorage.setItem('silentspot_is_logged_in', 'false');
+    localStorage.removeItem('silentspot_user_email');
+    
+    // Redirect to Explore
+    document.querySelector('[data-tab="explore"]').click();
+}
+
 // ------------------------------------
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initNavigation();
+    initAuthModal();
     initLocationModal();
     initQuickFilters();
     initFilterModal();
@@ -567,29 +678,33 @@ function initNavigation() {
         });
     });
 
-    // Profile Display Name Save
-    const nameInput = document.getElementById('profile-display-name-input');
-    const saveNameBtn = document.getElementById('btn-save-display-name');
-    if (nameInput && saveNameBtn) {
-        nameInput.addEventListener('input', () => {
-            saveNameBtn.classList.remove('hidden');
-        });
-        saveNameBtn.addEventListener('click', () => {
-            const newName = nameInput.value.trim() || 'You';
-            state.userName = newName;
-            localStorage.setItem('silentspot_username', newName);
-            saveNameBtn.classList.add('hidden');
-            renderProfileView(); // Re-render to update Leaderboard
-        });
-        nameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                saveNameBtn.click();
+    // Profile Logout and Theme
+    const logoutBtn = document.getElementById('btn-logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+    
+    const themeProfileBtn = document.getElementById('btn-theme-toggle-profile');
+    if (themeProfileBtn) {
+        themeProfileBtn.addEventListener('click', () => {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('silentspot_theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('silentspot_theme', 'dark');
             }
         });
     }
 }
 
 function switchTab(tabName) {
+    if ((tabName === 'profile' || tabName === 'saved') && !state.isLoggedIn) {
+        document.getElementById('auth-modal').classList.remove('hidden');
+        return;
+    }
+
     state.currentTab = tabName;
 
     // Update nav button active states
