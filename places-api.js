@@ -335,9 +335,9 @@ out center body;`;
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'text/plain'
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: query
+                body: 'data=' + encodeURIComponent(query)
             });
 
             if (!response.ok) {

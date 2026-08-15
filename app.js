@@ -435,7 +435,23 @@ function initLocationModal() {
     }
 
     if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-    if (applyBtn) applyBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    
+    if (applyBtn) {
+        applyBtn.addEventListener('click', () => {
+            // Check if there is an active search and we have results
+            if (autocompleteDropdown) {
+                const firstResult = autocompleteDropdown.querySelector('.autocomplete-item');
+                if (searchInput.value.trim().length >= 3 && firstResult && !autocompleteDropdown.classList.contains('hidden')) {
+                    firstResult.click(); // This triggers loadRealVenues and closes modal
+                    return;
+                }
+            }
+            
+            // Otherwise, just close modal and reload venues with current radius/location
+            modal.classList.add('hidden');
+            loadRealVenues(state.currentLat, state.currentLng, state.currentLocation);
+        });
+    }
 
     if (discoverHereBtn) {
         discoverHereBtn.addEventListener('click', () => {
@@ -509,6 +525,19 @@ function initLocationModal() {
         document.addEventListener('click', (e) => {
             if (!searchInput.contains(e.target) && !autocompleteDropdown.contains(e.target)) {
                 autocompleteDropdown.classList.add('hidden');
+            }
+        });
+
+        // Allow pressing Enter to select first result
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const firstResult = autocompleteDropdown.querySelector('.autocomplete-item');
+                if (firstResult && !autocompleteDropdown.classList.contains('hidden')) {
+                    firstResult.click();
+                } else if (applyBtn) {
+                    applyBtn.click();
+                }
             }
         });
     }
