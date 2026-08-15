@@ -362,33 +362,37 @@ async function loadRealVenues(lat, lng, locationName) {
     if (gridEl) gridEl.innerHTML = '';
     
     try {
-        const data = await fetchRealVenues(lat, lng, 3000);
-        
-        if (data && data.elements && data.elements.length > 0) {
-            // Map OSM data to venue objects, filter out unnamed places
-            const newVenues = data.elements
+        const result = await fetchRealVenues(lat, lng, 3000);
+        let newVenues = [];
+
+        if (result.source === 'geoapify') {
+            // Map Geoapify features to venue objects
+            newVenues = result.data.features
+                .map((f, i) => mapGeoapifyToVenue(f, i, locationName))
+                .filter(v => v !== null);
+        } else if (result.source === 'overpass') {
+            // Map Overpass elements to venue objects
+            newVenues = result.data.elements
                 .map((el, i) => mapOSMToVenue(el, i, locationName))
                 .filter(v => v !== null);
+        }
+
+        if (newVenues.length > 0) {
+            VENUES = newVenues;
             
-            if (newVenues.length > 0) {
-                VENUES = newVenues;
-                
-                // Show success banner
-                if (bannerEl) {
-                    bannerEl.className = 'mb-4 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
-                    bannerEl.innerHTML = '<span class="material-symbols-outlined text-sm">verified</span> Showing <strong>' + newVenues.length + ' real places</strong> from OpenStreetMap near ' + locationName;
-                    bannerEl.classList.remove('hidden');
-                }
-            } else {
-                // No named venues found — use demo
-                loadDemoVenues(lat, lng, locationName, bannerEl);
+            const sourceLabel = result.source === 'geoapify' ? 'Geoapify' : 'OpenStreetMap';
+            // Show success banner
+            if (bannerEl) {
+                bannerEl.className = 'mb-4 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+                bannerEl.innerHTML = '<span class="material-symbols-outlined text-sm">verified</span> Showing <strong>' + newVenues.length + ' real places</strong> from ' + sourceLabel + ' near ' + locationName;
+                bannerEl.classList.remove('hidden');
             }
         } else {
-            // API returned no results
+            // No named venues found — use demo
             loadDemoVenues(lat, lng, locationName, bannerEl);
         }
     } catch (err) {
-        console.warn('Overpass API error:', err);
+        console.warn('All venue APIs failed:', err);
         loadDemoVenues(lat, lng, locationName, bannerEl);
     }
     
