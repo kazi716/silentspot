@@ -1,5 +1,8 @@
-// SilentSpot - OpenStreetMap Places API Integration & User Contribution System
-// Fetches real venue data from the Overpass API (free, no API key needed)
+// SilentSpot - Geoapify Places API Integration & User Contribution System
+// Primary: Geoapify Places API (reliable, structured, CORS-friendly)
+// Fallback: Overpass API (free, no key needed)
+
+const GEOAPIFY_API_KEY = 'a1cb8891652045e49d15b14cb4de0e6e';
 
 const VENUE_PHOTO_POOLS = {
     cafe: [
@@ -237,6 +240,89 @@ function getAllContributions() {
     return contributions;
 }
 
+// ── Geoapify Venue Mapper ──────────────────────────────────────────
+function mapGeoapifyToVenue(feature, index, userLocationName) {
+    const props = feature.properties;
+    if (!props.name) return null;
+
+    const lat = props.lat;
+    const lng = props.lon;
+
+    // Determine category from Geoapify categories array
+    let category = 'cafe';
+    const cats = (props.categories || []).join(',');
+    if (cats.includes('education.library')) {
+        category = 'library';
+    } else if (cats.includes('office.coworking') || cats.includes('office')) {
+        category = 'coworking';
+    }
+
+    const defaults = VENUE_TYPE_DEFAULTS[category];
+    const pool = VENUE_PHOTO_POOLS[category];
+    const photoUrl = pool[index % pool.length];
+
+    const occupancyIndex = Math.floor(Math.random() * defaults.occupancyOptions.length);
+    const randomOccupancy = defaults.occupancyOptions[occupancyIndex];
+    const matchingColor = defaults.occupancyColors[occupancyIndex];
+
+    // Use Geoapify's structured address data
+    const constructedAddress = props.address_line2 || props.formatted || userLocationName || 'Unknown Location';
+    const openingHours = props.opening_hours || 'Hours not listed';
+
+    // Check for Wi-Fi from raw OSM data
+    let wifiStatus = defaults.wifiStatus;
+    if (props.datasource && props.datasource.raw) {
+        const raw = props.datasource.raw;
+        if (raw.internet_access === 'wlan' || raw.internet_access === 'yes') {
+            wifiStatus = 'Wi-Fi confirmed available';
+        }
+    }
+
+    // Check for wheelchair accessibility
+    const amenities = [...defaults.amenities];
+    if (props.facilities && props.facilities.wheelchair) {
+        amenities.push('Wheelchair Accessible');
+    }
+
+    const venueId = `geo-${props.place_id ? props.place_id.substring(0, 16) : index}`;
+
+    // Load user contributions
+    const contrib = getUserContribution(venueId);
+
+    return {
+        id: venueId,
+        name: props.name,
+        type: defaults.type,
+        category: category,
+        address: constructedAddress,
+        neighborhood: props.district || props.suburb || props.city || userLocationName,
+        distance: '...',
+        calculatedDistance: 0,
+        lat: lat,
+        lng: lng,
+        dbAvg: contrib && contrib.dbAvg != null ? contrib.dbAvg : defaults.dbAvg,
+        dbStatus: defaults.dbStatus,
+        wifiSpeed: contrib && contrib.wifiSpeed != null ? contrib.wifiSpeed : defaults.wifiSpeed,
+        wifiStatus: wifiStatus,
+        outletCoverage: defaults.outletCoverage,
+        outletStatus: defaults.outletStatus,
+        seating: defaults.seating,
+        seatingDesc: defaults.seatingDesc,
+        stayPolicy: defaults.stayPolicy,
+        stayPolicyDesc: defaults.stayPolicyDesc,
+        occupancy: randomOccupancy,
+        occupancyColor: matchingColor,
+        hours: openingHours,
+        image: contrib && contrib.photo ? contrib.photo : photoUrl,
+        amenities: amenities,
+        feedback: contrib && contrib.review ? [contrib.review] : [{ quote: 'Be the first to leave a review!', author: 'SilentSpot Community' }],
+        website: props.website || null,
+        phone: props.contact && props.contact.phone ? props.contact.phone : null,
+        isRealData: true
+    };
+}
+
+// ── Legacy OSM Venue Mapper (for Overpass fallback) ────────────────
 function mapOSMToVenue(element, index, userLocationName) {
     if (!element.tags || !element.tags.name) return null;
 
@@ -272,8 +358,6 @@ function mapOSMToVenue(element, index, userLocationName) {
     }
 
     const venueId = `osm-${element.id}`;
-    
-    // Load contributions
     const contrib = getUserContribution(venueId);
 
     return {
@@ -283,7 +367,7 @@ function mapOSMToVenue(element, index, userLocationName) {
         category: category,
         address: constructedAddress,
         neighborhood: userLocationName,
-        distance: '...', // Can be updated externally
+        distance: '...',
         calculatedDistance: 0,
         lat: lat,
         lng: lng,
@@ -307,7 +391,48 @@ function mapOSMToVenue(element, index, userLocationName) {
     };
 }
 
-async function fetchRealVenues(lat, lng, radiusMeters = 2000) {
+// ── PRIMARY: Geoapify Places API ───────────────────────────────────
+async function fetchRealVenues(lat, lng, radiusMeters = 3000) {
+    // Try Geoapify first (reliable, structured, CORS-friendly)
+    try {
+        const data = await fetchGeoapifyVenues(lat, lng, radiusMeters);
+        if (data && data.features && data.features.length > 0) {
+            console.log(`✅ Geoapify returned ${data.features.length} venues`);
+            return { source: 'geoapify', data: data };
+        }
+    } catch (err) {
+        console.warn('Geoapify failed, falling back to Overpass:', err);
+    }
+
+    // Fallback to Overpass API
+    try {
+        const data = await fetchOverpassVenues(lat, lng, radiusMeters);
+        if (data && data.elements && data.elements.length > 0) {
+            console.log(`✅ Overpass returned ${data.elements.length} elements`);
+            return { source: 'overpass', data: data };
+        }
+    } catch (err) {
+        console.warn('Overpass fallback also failed:', err);
+    }
+
+    // Both failed
+    throw new Error('All venue APIs failed');
+}
+
+// Geoapify Places API call
+async function fetchGeoapifyVenues(lat, lng, radiusMeters) {
+    const categories = 'catering.cafe,education.library,office.coworking';
+    const url = `https://api.geoapify.com/v2/places?categories=${categories}&filter=circle:${lng},${lat},${radiusMeters}&limit=40&apiKey=${GEOAPIFY_API_KEY}`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Geoapify API error: ${response.status}`);
+    }
+    return await response.json();
+}
+
+// Overpass API call (fallback)
+async function fetchOverpassVenues(lat, lng, radiusMeters) {
     const query = `[out:json][timeout:15];
 (
   node["amenity"="cafe"](around:${radiusMeters},${lat},${lng});
@@ -341,20 +466,18 @@ out center body;`;
             });
 
             if (!response.ok) {
-                console.warn(`Overpass API error on ${endpoint}: ${response.status}`);
+                console.warn(`Overpass error on ${endpoint}: ${response.status}`);
                 lastError = new Error(`Overpass API error: ${response.status}`);
-                continue; // try next endpoint
+                continue;
             }
 
-            const data = await response.json();
-            return data;
+            return await response.json();
         } catch (error) {
             console.warn(`Error fetching from ${endpoint}:`, error);
             lastError = error;
-            continue; // try next endpoint
+            continue;
         }
     }
 
-    console.error('All Overpass API endpoints failed.');
     throw lastError;
 }
