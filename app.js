@@ -443,14 +443,77 @@ function initLocationModal() {
         });
     }
 
-    // Radius Slider
-    if (radiusSlider && radiusDisplay) {
-        radiusSlider.addEventListener('input', (e) => {
-            state.maxDistanceRadius = parseFloat(e.target.value);
-            radiusDisplay.textContent = `${state.maxDistanceRadius.toFixed(1)} miles`;
-            renderVenuesGrid();
+    // Photon City Search Autocomplete
+    const autocompleteDropdown = document.getElementById('location-autocomplete-results');
+    let debounceTimer;
+
+    if (searchInput && autocompleteDropdown) {
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            const query = e.target.value.trim();
+            
+            if (query.length < 3) {
+                autocompleteDropdown.classList.add('hidden');
+                autocompleteDropdown.innerHTML = '';
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`);
+                    if (!res.ok) throw new Error('Photon API error');
+                    const data = await res.json();
+                    
+                    if (data.features.length === 0) {
+                        autocompleteDropdown.innerHTML = '<li class="p-3 text-xs text-secondary text-center">No results found</li>';
+                        autocompleteDropdown.classList.remove('hidden');
+                        return;
+                    }
+
+                    const results = data.features.map(f => ({
+                        name: f.properties.name,
+                        city: f.properties.city || f.properties.country || f.properties.state,
+                        lat: f.geometry.coordinates[1],
+                        lng: f.geometry.coordinates[0]
+                    }));
+
+                    autocompleteDropdown.innerHTML = results.map(r => `
+                        <li class="p-3 border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low dark:hover:bg-dark-surface-border cursor-pointer transition-colors autocomplete-item" data-lat="${r.lat}" data-lng="${r.lng}" data-name="${r.name}${r.city ? ', ' + r.city : ''}">
+                            <div class="font-bold text-xs text-on-surface dark:text-white">${r.name}</div>
+                            <div class="text-[10px] text-secondary dark:text-gray-400">${r.city || ''}</div>
+                        </li>
+                    `).join('');
+                    autocompleteDropdown.classList.remove('hidden');
+
+                    // Bind click events to items
+                    document.querySelectorAll('.autocomplete-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const lat = parseFloat(item.getAttribute('data-lat'));
+                            const lng = parseFloat(item.getAttribute('data-lng'));
+                            const name = item.getAttribute('data-name');
+                            
+                            searchInput.value = '';
+                            autocompleteDropdown.classList.add('hidden');
+                            modal.classList.add('hidden');
+                            
+                            loadRealVenues(lat, lng, name);
+                        });
+                    });
+                } catch (err) {
+                    console.error('Photon autocomplete error:', err);
+                }
+            }, 300);
+        });
+
+        // Hide dropdown on clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !autocompleteDropdown.contains(e.target)) {
+                autocompleteDropdown.classList.add('hidden');
+            }
         });
     }
+
+    // Radius Slider
 
     // GPS Location Detection Button
     if (gpsBtn) {
@@ -1543,7 +1606,7 @@ function updateMapTileLayer() {
     const isDark = document.documentElement.classList.contains('dark');
     const tileUrl = isDark
         ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
     if (state.tileLayer) {
         state.leafletMap.removeLayer(state.tileLayer);
