@@ -674,6 +674,16 @@ function renderCustomLocationsList(locationsArray) {
 }
 
 function setLocation(name, lat, lng) {
+    lat = parseFloat(lat);
+    lng = parseFloat(lng);
+    
+    // Guard against NaN coordinates
+    if (isNaN(lat) || isNaN(lng)) {
+        console.warn('setLocation called with invalid coords, using defaults');
+        lat = 40.7185;
+        lng = -74.0080;
+    }
+
     state.currentLocation = name;
     state.currentLat = lat;
     state.currentLng = lng;
@@ -683,6 +693,7 @@ function setLocation(name, lat, lng) {
 
     // Recalculate distance from new location for all venues
     VENUES.forEach(venue => {
+        if (isNaN(venue.lat) || isNaN(venue.lng)) return;
         const dist = calcHaversineDistance(lat, lng, venue.lat, venue.lng);
         venue.calculatedDistance = dist;
         venue.distance = `${dist.toFixed(1)} mi`;

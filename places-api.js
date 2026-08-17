@@ -245,8 +245,18 @@ function mapGeoapifyToVenue(feature, index, userLocationName) {
     const props = feature.properties;
     if (!props.name) return null;
 
-    const lat = props.lat;
-    const lng = props.lon;
+    // Extract coordinates — try properties first, then geometry
+    let lat = parseFloat(props.lat);
+    let lng = parseFloat(props.lon);
+    
+    // Fallback to geometry.coordinates [lng, lat] if properties don't have valid coords
+    if ((isNaN(lat) || isNaN(lng)) && feature.geometry && feature.geometry.coordinates) {
+        lng = parseFloat(feature.geometry.coordinates[0]);
+        lat = parseFloat(feature.geometry.coordinates[1]);
+    }
+    
+    // Skip venues with invalid coordinates entirely
+    if (isNaN(lat) || isNaN(lng)) return null;
 
     // Determine category from Geoapify categories array
     let category = 'cafe';
@@ -326,8 +336,11 @@ function mapGeoapifyToVenue(feature, index, userLocationName) {
 function mapOSMToVenue(element, index, userLocationName) {
     if (!element.tags || !element.tags.name) return null;
 
-    const lat = element.lat || (element.center && element.center.lat) || 0;
-    const lng = element.lon || (element.center && element.center.lon) || 0;
+    const lat = parseFloat(element.lat || (element.center && element.center.lat)) || 0;
+    const lng = parseFloat(element.lon || (element.center && element.center.lon)) || 0;
+
+    // Skip venues with invalid coordinates
+    if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) return null;
 
     let category = 'cafe';
     if (element.tags.amenity === 'library') {
