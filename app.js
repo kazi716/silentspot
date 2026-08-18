@@ -965,14 +965,20 @@ function createVenueCardHtml(venue) {
             <div class="p-5 flex-grow flex flex-col justify-between">
                 <div>
                     <!-- Header Title & dB Badge -->
-                    <div class="flex justify-between items-start mb-2">
+                    <div class="flex justify-between items-start mb-2 gap-2">
                         <div>
                             <h3 class="font-headline-sm text-lg font-bold text-on-surface dark:text-white group-hover:text-primary dark:group-hover:text-primary-fixed-dim transition-colors leading-snug">${venue.name}</h3>
                             <p class="text-xs text-secondary dark:text-gray-400 font-medium">${venue.type} • ${venue.neighborhood}</p>
                         </div>
-                        <div class="bg-primary/10 dark:bg-primary-fixed-dim/15 px-2.5 py-1 rounded-xl text-center min-w-[54px] shrink-0 border border-primary/20">
-                            <span class="block font-data-display text-base font-extrabold text-primary dark:text-primary-fixed-dim leading-none">${venue.dbAvg}</span>
-                            <span class="block font-label-caps text-[9px] font-bold text-primary dark:text-primary-fixed-dim uppercase tracking-wider">dB AVG</span>
+                        <div class="bg-primary/10 dark:bg-primary-fixed-dim/15 px-2.5 py-1.5 rounded-xl text-center min-w-[60px] shrink-0 border border-primary/20 flex flex-col justify-center items-center">
+                            <div class="flex items-baseline gap-0.5">
+                                <span class="block font-data-display text-base font-extrabold text-primary dark:text-primary-fixed-dim leading-none">${venue.dbAvg}</span>
+                                <span class="block font-label-caps text-[9px] font-bold text-primary dark:text-primary-fixed-dim uppercase tracking-wider">dB</span>
+                            </div>
+                            ${venue.isVerifiedDb 
+                                ? \`<span class="block text-[8px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mt-1">Verified</span>\`
+                                : \`<span class="block text-[7px] font-medium text-primary/70 dark:text-primary-fixed-dim/70 uppercase tracking-widest mt-1">Est.</span>\`
+                            }
                         </div>
                     </div>
 
@@ -1443,10 +1449,14 @@ function openVenueDetail(venueId) {
                                     <span class="material-symbols-outlined text-lg">volume_mute</span>
                                     <span>Noise Level</span>
                                 </div>
-                                <div class="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-xs font-bold">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    Live dB
-                                </div>
+                                ${venue.isVerifiedDb 
+                                    ? \`<div class="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
+                                        <span class="material-symbols-outlined text-[14px]">verified</span> Verified
+                                       </div>\`
+                                    : \`<div class="flex items-center gap-1.5 bg-amber-500/15 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
+                                        Estimated
+                                       </div>\`
+                                }
                             </div>
                             <div>
                                 <div class="flex items-baseline gap-1 mb-1">
@@ -1459,9 +1469,19 @@ function openVenueDetail(venueId) {
 
                         <!-- Wi-Fi Speed Bento Card -->
                         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl p-6 shadow-ambient border border-outline-variant/30 dark:border-dark-surface-border flex flex-col justify-between">
-                            <div class="flex items-center gap-2 text-secondary dark:text-gray-400 text-xs font-semibold mb-4">
-                                <span class="material-symbols-outlined text-lg">wifi</span>
-                                <span>Wi-Fi Speed</span>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-2 text-secondary dark:text-gray-400 text-xs font-semibold">
+                                    <span class="material-symbols-outlined text-lg">wifi</span>
+                                    <span>Wi-Fi Speed</span>
+                                </div>
+                                ${venue.isVerifiedWifi 
+                                    ? \`<div class="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
+                                        <span class="material-symbols-outlined text-[14px]">verified</span> Verified
+                                       </div>\`
+                                    : \`<div class="flex items-center gap-1.5 bg-amber-500/15 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
+                                        Estimated
+                                       </div>\`
+                                }
                             </div>
                             <div>
                                 <div class="font-data-display text-3xl font-extrabold text-on-surface dark:text-white mb-1">${venue.wifiSpeed} Mbps</div>
