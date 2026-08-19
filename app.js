@@ -44,9 +44,9 @@ const state = {
     ambientNodes: null,
     ambientGain: null,
     totalFocusMinutes: parseInt(localStorage.getItem('silentspot_focus_minutes') || '0', 10),
-    userName: localStorage.getItem('silentspot_username') || 'You',
-    isLoggedIn: localStorage.getItem('silentspot_is_logged_in') === 'true',
-    userEmail: localStorage.getItem('silentspot_user_email') || null
+    userName: 'You',
+    isLoggedIn: false,
+    userEmail: null
 };
 
 // --- GAMIFICATION & AI VIBE LOGIC ---
@@ -264,38 +264,58 @@ function initAuthModal() {
         }
     });
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('auth-email').value;
-        const password = document.getElementById('auth-password').value;
-        const name = document.getElementById('auth-name').value;
+        
+        // Show loading state
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span> Authenticating...';
+        submitBtn.disabled = true;
 
-        // Simulated Login/Register Logic
-        if (!isLoginMode && name.trim() === '') {
+        const email = document.getElementById('auth-email').value.trim();
+        const password = document.getElementById('auth-password').value;
+        const name = document.getElementById('auth-name').value.trim();
+
+        if (!isLoginMode && name === '') {
             errorText.textContent = 'Please enter a display name.';
             errorText.classList.remove('hidden');
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
             return;
         }
 
-        // Success Simulate
-        state.isLoggedIn = true;
-        state.userEmail = email;
-        if (!isLoginMode) {
-            state.userName = name;
-            localStorage.setItem('silentspot_username', name);
-        }
+        try {
+            if (isLoginMode) {
+                // Log in existing user
+                await firebase.auth().signInWithEmailAndPassword(email, password);
+            } else {
+                // Create new user
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                // Update profile with their display name
+                await userCredential.user.updateProfile({ displayName: name });
+                
+                // Force a manual state update here so it's instantly ready
+                state.userName = name;
+            }
 
-        localStorage.setItem('silentspot_is_logged_in', 'true');
-        localStorage.setItem('silentspot_user_email', email);
+            authModal.classList.add('hidden');
+            errorText.classList.add('hidden');
+            form.reset();
 
-        authModal.classList.add('hidden');
-        errorText.classList.add('hidden');
-
-        // Refresh Current Tab View
-        if (state.currentTab === 'profile') {
-            renderProfileView();
-        } else if (state.currentTab === 'saved') {
-            renderSavedVenues();
+            // Refresh Current Tab View if needed
+            if (state.currentTab === 'profile') {
+                renderProfileView();
+            } else if (state.currentTab === 'saved') {
+                renderSavedView();
+            }
+        } catch (error) {
+            console.error("Auth error:", error);
+            // Firebase sends back helpful error messages (e.g. 'invalid-email', 'wrong-password')
+            errorText.textContent = error.message;
+            errorText.classList.remove('hidden');
+        } finally {
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
         }
     });
 }
@@ -309,19 +329,41 @@ function requireAuth(callback) {
 }
 
 function handleLogout() {
-    state.isLoggedIn = false;
-    state.userEmail = null;
-    localStorage.setItem('silentspot_is_logged_in', 'false');
-    localStorage.removeItem('silentspot_user_email');
-
-    // Redirect to Explore
-    document.querySelector('[data-tab="explore"]').click();
+    firebase.auth().signOut().then(() => {
+        state.isLoggedIn = false;
+        state.userEmail = null;
+        state.userName = null;
+        
+        // Redirect to Explore if they were on a protected tab
+        if (state.currentTab === 'profile' || state.currentTab === 'saved') {
+            switchTab('explore');
+        }
+    }).catch((error) => {
+        console.error("Sign out error", error);
+    });
 }
 
 // ------------------------------------
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
+    // Listen for real Firebase Auth state changes
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            state.isLoggedIn = true;
+            state.userEmail = user.email;
+            state.userName = user.displayName || 'SilentSpot User';
+            
+            // Refresh protected views if they are open
+            if (state.currentTab === 'profile') renderProfileView();
+            if (state.currentTab === 'saved') renderSavedView();
+        } else {
+            state.isLoggedIn = false;
+            state.userEmail = null;
+            state.userName = null;
+        }
+    });
+
     initTheme();
     initNavigation();
     initAuthModal();
