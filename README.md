@@ -1,33 +1,54 @@
-# 🎧 SilentSpot - Quiet Workspaces & Real-Time Acoustic Intelligence
+# 🎧 SilentSpot – Find Your Focus
 
-> 🎓 **Project created during the Google for Developers: Build with AI Bootcamp at Techno India University (TIU), Kolkata** (August 9, 2026).
+**SilentSpot** is a modern web application designed for remote workers, students, and digital nomads to discover quiet workspaces, cafés, and libraries based on acoustic environments and technical amenities.
 
-SilentSpot is a modern web application for discovering quiet workspaces, cafés, and libraries with real-time noise levels (dB), Wi-Fi speeds, power outlet availability %, and stay policies.
-
----
-
-## 🏛️ About The TIU Bootcamp Project
-This application was conceptualized and built during the **Build with AI Bootcamp** organized by **Google for Developers** & **Hack2Skill** at **Techno India University (TIU), Kolkata**. 
-
-It combines **Generative UI design ideation**, **Acoustic Intelligence**, and **Interactive GIS Mapping** to solve the productivity challenge of finding quiet focus spaces in urban environments.
+Stop guessing where you can take a quiet meeting or do deep work. SilentSpot provides data-driven venue intelligence, from ambient decibel (dB) averages to Wi-Fi speeds and power outlet coverage.
 
 ---
 
 ## 🌟 Key Features
-- 🔍 **Interactive Workspace Discovery**: Filter spots by noise level (<45 dB), Wi-Fi speed (100+ Mbps), power outlets (>80%), cafés, and libraries.
-- 🗺️ **Global Connected Map (Leaflet.js & OpenStreetMap)**: Search any city globally or click anywhere on the map to auto-discover quiet focus spots with interactive acoustic heatmap overlays.
-- 🎙️ **Live dB Sound Check**: Web Audio API room noise meter using microphone input & simulated spectrum visualizer.
-- 📊 **Workspace Comparison Matrix**: Side-by-side technical & acoustic comparison table.
-- 🎧 **Focus Audio Synthesizer**: Built-in background white noise generator (Rain, Café, Ocean Waves, 432Hz Alpha Waves).
-- ⏱️ **Focus Session Timer & Gamification**: Track active work sessions to earn "Focus Minutes". Level up from *Novice* to *Zen Master* and climb the Global Leaderboard.
-- 🔮 **AI Vibe Checks**: Smart, auto-generated 1-sentence summaries predicting the productivity potential of each venue based on its acoustics and amenities.
+
+- 🔍 **Intelligent Venue Discovery**: Filter workspaces by noise level (<45 dB), Wi-Fi speed (100+ Mbps), power outlets, and venue type (Café, Library, Coworking).
+- 🗺️ **Global Coverage (Geoapify + OSM)**: Powered by the Geoapify Places API and OpenStreetMap, search any city globally to auto-discover quiet focus spots with beautiful CARTO map tiles.
+- 📊 **Community Estimated & User Verified Data**: Smart venue baselines derived from category averages, which seamlessly upgrade to "User Verified" metrics when the community contributes real data.
+- 🎙️ **Live dB Sound Check**: Built-in room noise meter utilizing the Web Audio API and microphone input to measure your current environment's acoustic profile.
+- ⚖️ **Workspace Comparison Matrix**: Side-by-side technical and acoustic comparison engine.
+- 🎧 **Focus Audio Synthesizer**: Built-in ambient noise generator (Rain, Lo-fi Café, Ocean Waves, Alpha Waves) to help you zone in anywhere.
+- 🔮 **AI Vibe Checks**: Smart, auto-generated productivity summaries based on a venue's unique acoustics and amenities.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+- **Frontend**: HTML5, Vanilla JavaScript, Tailwind CSS (CDN for rapid prototyping)
+- **Mapping & GIS**: Leaflet.js, CARTO Basemaps (Positron & Dark Matter)
+- **Data APIs**: 
+  - **Geoapify Places API** (Primary source for rich, structured POI data)
+  - **Overpass API / OpenStreetMap** (Robust global fallback engine)
+  - **Photon by Komoot** (Global city autocomplete & geocoding)
+- **State & Storage**: Client-side `localStorage` for theming, user contributions, saved venues, and simulated login.
 
 ---
 
 ## 🚀 Setup & Local Preview
-Clone the repository and open `index.html` in your browser or run a simple local HTTP server:
-```bash
+
+Clone the repository and run a simple local HTTP server:
+
+\`\`\`bash
 git clone https://github.com/kazi716/silentspot.git
 cd silentspot
+npx http-server -p 8080
+# OR
 python -m http.server 8080
-```
+\`\`\`
+
+Open \`http://localhost:8080\` in your browser to view the application.
+
+---
+
+## 🤝 Contributing
+Found a great quiet spot? Use the in-app **Contribute** feature to submit verified Wi-Fi speeds and acoustic dB readings to help upgrade the community estimates!
+
+---
+
+*Designed and developed as a personal project for the remote work community.*
