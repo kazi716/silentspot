@@ -219,7 +219,7 @@ function getUserContribution(venueId) {
     return window.VENUE_CONTRIBUTIONS[venueId] || null;
 }
 
-function saveUserContribution(venueId, field, value) {
+async function saveUserContribution(venueId, field, value) {
     try {
         const contrib = window.VENUE_CONTRIBUTIONS[venueId] || {
             photo: null,
@@ -234,14 +234,13 @@ function saveUserContribution(venueId, field, value) {
         
         // Persist to Firebase Firestore
         if (window.firebaseDb) {
-            window.firebaseDb.collection('contributions').doc(venueId).set(contrib, { merge: true })
-                .catch(e => console.error('Firebase save failed:', e));
+            await window.firebaseDb.collection('contributions').doc(venueId).set(contrib, { merge: true });
         }
 
         return contrib;
     } catch (e) {
         console.error('Error saving contribution', e);
-        return null;
+        throw e; // Throw so UI can catch and alert user gracefully
     }
 }
 

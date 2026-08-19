@@ -2046,30 +2046,46 @@ function initContributionModal() {
     if (cancelBtn) cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
 
     if (form) {
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const venueId = document.getElementById('contrib-venue-id').value;
+            
+            // Change button state to show loading
+            const submitBtn = document.getElementById('btn-save-contribution');
+            const originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined text-lg animate-spin">sync</span> Saving...';
+            submitBtn.disabled = true;
 
+            const venueId = document.getElementById('contrib-venue-id').value;
             const photoUrl = document.getElementById('contrib-photo').value.trim();
             const wifiSpeed = document.getElementById('contrib-wifi').value;
             const noiseLevel = document.getElementById('contrib-noise').value;
             const reviewQuote = document.getElementById('contrib-review').value.trim();
 
-            if (photoUrl) saveUserContribution(venueId, 'photo', photoUrl);
-            if (wifiSpeed) saveUserContribution(venueId, 'wifiSpeed', parseInt(wifiSpeed, 10));
-            if (noiseLevel) saveUserContribution(venueId, 'dbAvg', parseInt(noiseLevel, 10));
-            if (reviewQuote) saveUserContribution(venueId, 'review', { quote: reviewQuote, author: 'SilentSpot User' });
+            try {
+                const promises = [];
+                if (photoUrl) promises.push(saveUserContribution(venueId, 'photo', photoUrl));
+                if (wifiSpeed) promises.push(saveUserContribution(venueId, 'wifiSpeed', parseInt(wifiSpeed, 10)));
+                if (noiseLevel) promises.push(saveUserContribution(venueId, 'dbAvg', parseInt(noiseLevel, 10)));
+                if (reviewQuote) promises.push(saveUserContribution(venueId, 'review', { quote: reviewQuote, author: 'SilentSpot User' }));
+                
+                await Promise.all(promises);
 
-            modal.classList.add('hidden');
-            form.reset();
+                modal.classList.add('hidden');
+                form.reset();
 
-            // Show toast and reload venues to apply changes
-            alert('Thank you! Your contribution has been saved locally.');
-            renderVenuesGrid();
+                // Show toast and reload venues to apply changes
+                alert('Thank you! Your contribution has been saved globally.');
+                renderVenuesGrid();
 
-            // Update open detail view if active
-            if (state.currentTab === 'details' && state.selectedVenueId === venueId) {
-                openVenueDetail(venueId);
+                // Update open detail view if active
+                if (state.currentTab === 'details' && state.selectedVenueId === venueId) {
+                    openVenueDetail(venueId);
+                }
+            } catch (error) {
+                alert('We are experiencing high traffic and cannot save contributions right now. Please try again later.');
+            } finally {
+                submitBtn.innerHTML = originalBtnHtml;
+                submitBtn.disabled = false;
             }
         });
     }
