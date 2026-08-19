@@ -234,7 +234,12 @@ async function saveUserContribution(venueId, field, value) {
         
         // Persist to Firebase Firestore
         if (window.firebaseDb) {
-            await window.firebaseDb.collection('contributions').doc(venueId).set(contrib, { merge: true });
+            const payload = { 
+                ...contrib, 
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                userAgent: navigator.userAgent
+            };
+            await window.firebaseDb.collection('contributions').doc(venueId).set(payload, { merge: true });
         }
 
         return contrib;
