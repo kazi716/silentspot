@@ -60,7 +60,7 @@ const GAMIFICATION_LEVELS = [
 function getUserLevel(minutes) {
     let currentLevel = GAMIFICATION_LEVELS[0];
     let nextLevel = GAMIFICATION_LEVELS[1];
-    
+
     for (let i = 0; i < GAMIFICATION_LEVELS.length; i++) {
         if (minutes >= GAMIFICATION_LEVELS[i].min) {
             currentLevel = GAMIFICATION_LEVELS[i];
@@ -74,44 +74,44 @@ function generateVibeSummary(venue) {
     const isQuiet = venue.dbAvg <= 45;
     const isFast = venue.wifiSpeed >= 100;
     const isPower = venue.outletCoverage >= 70;
-    
+
     let vibes = [];
     if (isQuiet && isFast) vibes.push("Ultimate productivity sanctuary");
     else if (isQuiet) vibes.push("Library-like hush for deep work");
     else if (isFast) vibes.push("High-speed hub with energetic chatter");
     else vibes.push("Casual spot for light reading");
-    
+
     if (venue.amenities && venue.amenities.includes("Ergonomic Chairs")) vibes[0] += " & great seating.";
     else if (venue.amenities && venue.amenities.includes("Abundant Natural Light")) vibes[0] += " drenched in sunlight.";
     else if (isPower) vibes[0] += " with endless power.";
     else vibes[0] += ".";
-    
+
     return vibes[0];
 }
 
 function renderProfileView() {
     const { currentLevel, nextLevel } = getUserLevel(state.totalFocusMinutes);
-    
+
     document.getElementById('profile-focus-minutes').textContent = state.totalFocusMinutes;
     document.getElementById('profile-level-name').textContent = currentLevel.name;
-    
+
     // New Header Fields
     const greetingName = document.getElementById('profile-greeting-name');
     if (greetingName) greetingName.textContent = state.userName;
-    
+
     const emailDisplay = document.getElementById('profile-email-display');
     if (emailDisplay) emailDisplay.textContent = state.userEmail || 'Guest';
-    
+
     const avatar = document.getElementById('profile-avatar-initial');
     if (avatar) avatar.textContent = state.userName.charAt(0).toUpperCase();
-    
+
     const badge = document.getElementById('profile-level-badge');
     badge.className = `w-24 h-24 rounded-full bg-gradient-to-br ${currentLevel.color} mx-auto flex items-center justify-center shadow-lg border-4 border-white dark:border-dark-surface-card mb-3 transition-colors duration-500`;
     badge.innerHTML = `<span class="material-symbols-outlined text-5xl text-white">${currentLevel.icon}</span>`;
-    
+
     const progressBar = document.getElementById('profile-progress-bar');
     const nextLevelText = document.getElementById('profile-next-level');
-    
+
     if (nextLevel) {
         const progress = Math.min(100, (state.totalFocusMinutes / nextLevel.min) * 100);
         progressBar.style.width = `${progress}%`;
@@ -120,7 +120,7 @@ function renderProfileView() {
         progressBar.style.width = '100%';
         nextLevelText.textContent = 'Max Level Reached!';
     }
-    
+
     const leaderboardList = document.getElementById('leaderboard-list');
     const mockUsers = [
         { name: "Sarah K.", mins: 1240, level: "Zen Master" },
@@ -129,9 +129,9 @@ function renderProfileView() {
         { name: "Jordan T.", mins: 320, level: "Deep Worker" },
         { name: "Emily R.", mins: 45, level: "Novice" }
     ];
-    
+
     mockUsers.sort((a, b) => b.mins - a.mins);
-    
+
     leaderboardList.innerHTML = mockUsers.map((u, i) => `
         <div class="flex items-center justify-between p-4 ${u.isUser ? 'bg-primary/5 dark:bg-primary/10' : ''}">
             <div class="flex items-center gap-4">
@@ -144,7 +144,7 @@ function renderProfileView() {
             <div class="font-data-display text-sm font-bold text-on-surface dark:text-white">${u.mins} <span class="text-[10px] font-normal text-secondary">mins</span></div>
         </div>
     `).join('');
-    
+
     renderContributionsList();
     renderProfileSavedGrid();
 }
@@ -152,10 +152,10 @@ function renderProfileView() {
 function renderContributionsList() {
     const listEl = document.getElementById('contributions-list');
     if (!listEl) return;
-    
+
     const contributions = getAllContributions();
     const venueIds = Object.keys(contributions);
-    
+
     if (venueIds.length === 0) {
         listEl.innerHTML = `
             <div class="text-center p-8 bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl border border-outline-variant/30 dark:border-dark-surface-border">
@@ -166,12 +166,12 @@ function renderContributionsList() {
         `;
         return;
     }
-    
+
     listEl.innerHTML = venueIds.map(id => {
         const c = contributions[id];
         const v = VENUES.find(venue => venue.id === id) || DEMO_VENUES.find(venue => venue.id === id);
         const venueName = v ? v.name : 'Unknown Venue';
-        
+
         return `
             <div class="bg-surface-container-lowest dark:bg-dark-surface-card p-4 rounded-2xl border border-outline-variant/30 dark:border-dark-surface-border flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                 <div>
@@ -191,7 +191,7 @@ function renderContributionsList() {
 function renderProfileSavedGrid() {
     const gridEl = document.getElementById('profile-saved-grid');
     if (!gridEl) return;
-    
+
     const savedVenues = VENUES.filter(v => state.savedVenueIds.includes(v.id));
     if (savedVenues.length === 0) {
         gridEl.innerHTML = `
@@ -203,7 +203,7 @@ function renderProfileSavedGrid() {
         `;
         return;
     }
-    
+
     gridEl.innerHTML = savedVenues.map(venue => `
         <div class="venue-card cursor-pointer group bg-surface-container-lowest dark:bg-dark-surface-card rounded-2xl overflow-hidden border border-outline-variant/30 dark:border-dark-surface-border shadow-sm hover:shadow-md transition-all flex flex-col" onclick="openVenueDetails('${venue.id}')">
             <div class="h-24 w-full bg-surface-container-high relative overflow-hidden shrink-0">
@@ -232,7 +232,7 @@ function initAuthModal() {
     const title = document.getElementById('auth-title');
     const subtitle = document.getElementById('auth-subtitle');
     const errorText = document.getElementById('auth-error');
-    
+
     let isLoginMode = true;
 
     // Toggle Login / Register
@@ -284,13 +284,13 @@ function initAuthModal() {
             state.userName = name;
             localStorage.setItem('silentspot_username', name);
         }
-        
+
         localStorage.setItem('silentspot_is_logged_in', 'true');
         localStorage.setItem('silentspot_user_email', email);
-        
+
         authModal.classList.add('hidden');
         errorText.classList.add('hidden');
-        
+
         // Refresh Current Tab View
         if (state.currentTab === 'profile') {
             renderProfileView();
@@ -313,7 +313,7 @@ function handleLogout() {
     state.userEmail = null;
     localStorage.setItem('silentspot_is_logged_in', 'false');
     localStorage.removeItem('silentspot_user_email');
-    
+
     // Redirect to Explore
     document.querySelector('[data-tab="explore"]').click();
 }
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAmbientAudio();
     initContributionModal();
     initLeafletMap();
-    
+
     // Initial data fetch
     loadRealVenues(state.currentLat, state.currentLng, state.currentLocation);
     updateSavedBadge();
@@ -345,8 +345,8 @@ function calcHaversineDistance(lat1, lon1, lat2, lon2) {
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
@@ -356,11 +356,11 @@ async function loadRealVenues(lat, lng, locationName) {
     const loadingEl = document.getElementById('venues-loading');
     const gridEl = document.getElementById('venues-grid');
     const bannerEl = document.getElementById('data-source-banner');
-    
+
     // Show loading skeleton
     if (loadingEl) loadingEl.classList.remove('hidden');
     if (gridEl) gridEl.innerHTML = '';
-    
+
     try {
         const result = await fetchRealVenues(lat, lng, 3000);
         let newVenues = [];
@@ -379,7 +379,7 @@ async function loadRealVenues(lat, lng, locationName) {
 
         if (newVenues.length > 0) {
             VENUES = newVenues;
-            
+
             const sourceLabel = result.source === 'geoapify' ? 'Geoapify' : 'OpenStreetMap';
             // Show success banner
             if (bannerEl) {
@@ -395,10 +395,10 @@ async function loadRealVenues(lat, lng, locationName) {
         console.warn('All venue APIs failed:', err);
         loadDemoVenues(lat, lng, locationName, bannerEl);
     }
-    
+
     // Hide loading skeleton
     if (loadingEl) loadingEl.classList.add('hidden');
-    
+
     // Recalculate distances and render
     setLocation(locationName, lat, lng);
 }
@@ -410,7 +410,7 @@ function loadDemoVenues(lat, lng, locationName, bannerEl) {
         lng: Number(lng) + (Math.random() - 0.5) * 0.01,
         neighborhood: locationName
     }));
-    
+
     if (bannerEl) {
         bannerEl.className = 'mb-4 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
         bannerEl.innerHTML = '<span class="material-symbols-outlined text-sm">info</span> Showing <strong>demo venues</strong> — no real places found nearby or API unavailable.';
@@ -439,7 +439,7 @@ function initLocationModal() {
     }
 
     if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-    
+
     if (applyBtn) {
         applyBtn.addEventListener('click', () => {
             // Check if there is an active search and we have results
@@ -450,7 +450,7 @@ function initLocationModal() {
                     return;
                 }
             }
-            
+
             // Otherwise, just close modal and reload venues with current radius/location
             modal.classList.add('hidden');
             loadRealVenues(state.currentLat, state.currentLng, state.currentLocation);
@@ -471,7 +471,7 @@ function initLocationModal() {
         searchInput.addEventListener('input', (e) => {
             clearTimeout(debounceTimer);
             const query = e.target.value.trim();
-            
+
             if (query.length < 3) {
                 autocompleteDropdown.classList.add('hidden');
                 autocompleteDropdown.innerHTML = '';
@@ -483,7 +483,7 @@ function initLocationModal() {
                     const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`);
                     if (!res.ok) throw new Error('Photon API error');
                     const data = await res.json();
-                    
+
                     if (data.features.length === 0) {
                         autocompleteDropdown.innerHTML = '<li class="p-3 text-xs text-secondary text-center">No results found</li>';
                         autocompleteDropdown.classList.remove('hidden');
@@ -511,11 +511,11 @@ function initLocationModal() {
                             const lat = parseFloat(item.getAttribute('data-lat'));
                             const lng = parseFloat(item.getAttribute('data-lng'));
                             const name = item.getAttribute('data-name');
-                            
+
                             searchInput.value = '';
                             autocompleteDropdown.classList.add('hidden');
                             modal.classList.add('hidden');
-                            
+
                             loadRealVenues(lat, lng, name);
                         });
                     });
@@ -563,7 +563,7 @@ function initLocationModal() {
                 async (pos) => {
                     const lat = pos.coords.latitude;
                     const lng = pos.coords.longitude;
-                    
+
                     let locationName = 'Current GPS Location';
                     try {
                         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
@@ -666,7 +666,7 @@ function renderCustomLocationsList(locationsArray) {
             const name = btn.getAttribute('data-name');
             const lat = parseFloat(btn.getAttribute('data-lat'));
             const lng = parseFloat(btn.getAttribute('data-lng'));
-            
+
             loadRealVenues(lat, lng, name);
             document.getElementById('location-modal').classList.add('hidden');
         });
@@ -676,7 +676,7 @@ function renderCustomLocationsList(locationsArray) {
 function setLocation(name, lat, lng) {
     lat = parseFloat(lat);
     lng = parseFloat(lng);
-    
+
     // Guard against NaN coordinates
     if (isNaN(lat) || isNaN(lng)) {
         console.warn('setLocation called with invalid coords, using defaults');
@@ -712,9 +712,9 @@ function setLocation(name, lat, lng) {
 
 // Theme Toggle Functionality
 function initTheme() {
-    const isDark = localStorage.getItem('silentspot_theme') === 'dark' || 
+    const isDark = localStorage.getItem('silentspot_theme') === 'dark' ||
         (!('silentspot_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    
+
     if (isDark) {
         document.documentElement.classList.add('dark');
     } else {
@@ -790,7 +790,7 @@ function initNavigation() {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', handleLogout);
     }
-    
+
     const themeProfileBtn = document.getElementById('btn-theme-toggle-profile');
     if (themeProfileBtn) {
         themeProfileBtn.addEventListener('click', () => {
@@ -896,7 +896,7 @@ function getFilteredVenues() {
         if (venue.dbAvg > state.filters.maxDb) return false;
         if (venue.wifiSpeed < state.filters.minWifi) return false;
         if (venue.outletCoverage < state.filters.minOutlets) return false;
-        
+
         if (state.filters.amenities.length > 0) {
             const hasAllSelected = state.filters.amenities.every(amenity => venue.amenities.includes(amenity));
             if (!hasAllSelected) return false;
@@ -975,10 +975,10 @@ function createVenueCardHtml(venue) {
                                 <span class="block font-data-display text-base font-extrabold text-primary dark:text-primary-fixed-dim leading-none">${venue.dbAvg}</span>
                                 <span class="block font-label-caps text-[9px] font-bold text-primary dark:text-primary-fixed-dim uppercase tracking-wider">dB</span>
                             </div>
-                            ${venue.isVerifiedDb 
-                                ? \`<span class="block text-[8px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mt-1">Verified</span>\`
-                                : \`<span class="block text-[7px] font-medium text-primary/70 dark:text-primary-fixed-dim/70 uppercase tracking-widest mt-1">Est.</span>\`
-                            }
+                            ${venue.isVerifiedDb
+            ? `<span class="block text-[8px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mt-1">Verified</span>`
+            : `<span class="block text-[7px] font-medium text-primary/70 dark:text-primary-fixed-dim/70 uppercase tracking-widest mt-1">Est.</span>`
+        }
                         </div>
                     </div>
 
@@ -1142,9 +1142,9 @@ function initAmbientAudio() {
     function stopCurrentTrack() {
         if (state.ambientNodes) {
             if (Array.isArray(state.ambientNodes)) {
-                state.ambientNodes.forEach(n => { try { n.stop(); n.disconnect(); } catch(e){} });
+                state.ambientNodes.forEach(n => { try { n.stop(); n.disconnect(); } catch (e) { } });
             } else {
-                try { state.ambientNodes.stop(); state.ambientNodes.disconnect(); } catch(e){}
+                try { state.ambientNodes.stop(); state.ambientNodes.disconnect(); } catch (e) { }
             }
             state.ambientNodes = null;
         }
@@ -1191,7 +1191,7 @@ function initAmbientAudio() {
             if (soundType === 'rain') {
                 if (titleElem) titleElem.textContent = 'Playing: Soft Rainfall';
                 if (statusElem) statusElem.textContent = 'Synthetic pink noise rain drops with low-pass filter';
-                
+
                 const bufferSize = ctx.sampleRate * 2;
                 const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
                 const output = buffer.getChannelData(0);
@@ -1449,14 +1449,14 @@ function openVenueDetail(venueId) {
                                     <span class="material-symbols-outlined text-lg">volume_mute</span>
                                     <span>Noise Level</span>
                                 </div>
-                                ${venue.isVerifiedDb 
-                                    ? \`<div class="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
-                                        <span class="material-symbols-outlined text-[14px]">verified</span> Verified
-                                       </div>\`
-                                    : \`<div class="flex items-center gap-1.5 bg-amber-500/15 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
-                                        Estimated
-                                       </div>\`
-                                }
+                                ${venue.isVerifiedDb
+            ? `<div class="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
+        <span class="material-symbols-outlined text-[14px]">verified</span> Verified
+       </div>`
+            : `<div class="flex items-center gap-1.5 bg-amber-500/15 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
+        Estimated
+       </div>`
+        }
                             </div>
                             <div>
                                 <div class="flex items-baseline gap-1 mb-1">
@@ -1474,14 +1474,14 @@ function openVenueDetail(venueId) {
                                     <span class="material-symbols-outlined text-lg">wifi</span>
                                     <span>Wi-Fi Speed</span>
                                 </div>
-                                ${venue.isVerifiedWifi 
-                                    ? \`<div class="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
-                                        <span class="material-symbols-outlined text-[14px]">verified</span> Verified
-                                       </div>\`
-                                    : \`<div class="flex items-center gap-1.5 bg-amber-500/15 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
-                                        Estimated
-                                       </div>\`
-                                }
+                                ${venue.isVerifiedWifi
+            ? `<div class="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
+        <span class="material-symbols-outlined text-[14px]">verified</span> Verified
+       </div>`
+            : `<div class="flex items-center gap-1.5 bg-amber-500/15 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold">
+        Estimated
+       </div>`
+        }
                             </div>
                             <div>
                                 <div class="font-data-display text-3xl font-extrabold text-on-surface dark:text-white mb-1">${venue.wifiSpeed} Mbps</div>
@@ -2049,7 +2049,7 @@ function initContributionModal() {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const venueId = document.getElementById('contrib-venue-id').value;
-            
+
             const photoUrl = document.getElementById('contrib-photo').value.trim();
             const wifiSpeed = document.getElementById('contrib-wifi').value;
             const reviewQuote = document.getElementById('contrib-review').value.trim();
@@ -2060,11 +2060,11 @@ function initContributionModal() {
 
             modal.classList.add('hidden');
             form.reset();
-            
+
             // Show toast and reload venues to apply changes
             alert('Thank you! Your contribution has been saved locally.');
             renderVenuesGrid();
-            
+
             // Update open detail view if active
             if (state.currentTab === 'details' && state.selectedVenueId === venueId) {
                 openVenueDetail(venueId);
@@ -2076,14 +2076,14 @@ function initContributionModal() {
 function openContributionModal(venueId) {
     const modal = document.getElementById('contribution-modal');
     if (!modal) return;
-    
+
     document.getElementById('contrib-venue-id').value = venueId;
-    
+
     const venue = VENUES.find(v => v.id === venueId);
     if (venue) {
         document.getElementById('contribution-venue-name').textContent = venue.name;
     }
-    
+
     document.getElementById('contribution-form').reset();
     modal.classList.remove('hidden');
 }
