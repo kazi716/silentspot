@@ -264,6 +264,24 @@ function initAuthModal() {
         }
     });
 
+    const googleBtn = document.getElementById('btn-google-auth');
+    if (googleBtn) {
+        googleBtn.addEventListener('click', async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await firebase.auth().signInWithPopup(provider);
+                authModal.classList.add('hidden');
+                errorText.classList.add('hidden');
+                
+                // state observer handles the refresh
+            } catch (err) {
+                console.error("Google Auth error:", err);
+                errorText.textContent = err.message;
+                errorText.classList.remove('hidden');
+            }
+        });
+    }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
