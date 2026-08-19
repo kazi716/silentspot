@@ -880,6 +880,23 @@
         </div>
     </div>
 
+    <!-- Firebase SDK (Community Contributions Backend) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDBL7TLIsezn-bNi08YGetqj73tKBehgts",
+            authDomain: "silentspot-b5d86.firebaseapp.com",
+            projectId: "silentspot-b5d86",
+            storageBucket: "silentspot-b5d86.firebasestorage.app",
+            messagingSenderId: "314610738659",
+            appId: "1:314610738659:web:b6c4762607c3c82b3cacd6",
+            measurementId: "G-WN3K568N1F"
+        };
+        firebase.initializeApp(firebaseConfig);
+        window.firebaseDb = firebase.firestore();
+    </script>
+
     <!-- JavaScript Application Logic -->
     <script src="places-api.js"></script>
     <script src="app.js"></script>

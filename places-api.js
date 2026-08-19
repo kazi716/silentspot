@@ -200,26 +200,44 @@ const DEMO_VENUES = [
     }
 ];
 
-function getUserContribution(venueId) {
+window.VENUE_CONTRIBUTIONS = {};
+
+async function syncFirebaseContributions() {
     try {
-        const data = localStorage.getItem(`silentspot_contrib_${venueId}`);
-        return data ? JSON.parse(data) : null;
+        if (!window.firebaseDb) return;
+        const snapshot = await window.firebaseDb.collection('contributions').get();
+        snapshot.forEach(doc => {
+            window.VENUE_CONTRIBUTIONS[doc.id] = doc.data();
+        });
+        console.log('Firebase contributions synced globally');
     } catch (e) {
-        console.error('Error reading contribution', e);
-        return null;
+        console.error('Error syncing Firebase contributions:', e);
     }
+}
+
+function getUserContribution(venueId) {
+    return window.VENUE_CONTRIBUTIONS[venueId] || null;
 }
 
 function saveUserContribution(venueId, field, value) {
     try {
-        const contrib = getUserContribution(venueId) || {
+        const contrib = window.VENUE_CONTRIBUTIONS[venueId] || {
             photo: null,
             wifiSpeed: null,
             dbAvg: null,
             review: null
         };
         contrib[field] = value;
-        localStorage.setItem(`silentspot_contrib_${venueId}`, JSON.stringify(contrib));
+        
+        // Update local cache instantly
+        window.VENUE_CONTRIBUTIONS[venueId] = contrib;
+        
+        // Persist to Firebase Firestore
+        if (window.firebaseDb) {
+            window.firebaseDb.collection('contributions').doc(venueId).set(contrib, { merge: true })
+                .catch(e => console.error('Firebase save failed:', e));
+        }
+
         return contrib;
     } catch (e) {
         console.error('Error saving contribution', e);
@@ -228,19 +246,7 @@ function saveUserContribution(venueId, field, value) {
 }
 
 function getAllContributions() {
-    const contributions = {};
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('silentspot_contrib_')) {
-            try {
-                const venueId = key.replace('silentspot_contrib_', '');
-                contributions[venueId] = JSON.parse(localStorage.getItem(key));
-            } catch (e) {
-                console.error('Error parsing contribution key', key, e);
-            }
-        }
-    }
-    return contributions;
+    return window.VENUE_CONTRIBUTIONS;
 }
 
 // ── Geoapify Venue Mapper ──────────────────────────────────────────
@@ -415,7 +421,12 @@ function mapOSMToVenue(element, index, userLocationName) {
 
 // ── PRIMARY: Geoapify Places API ───────────────────────────────────
 async function fetchRealVenues(lat, lng, radiusMeters = 3000) {
-    // Try Geoapify first (reliable, structured, CORS-friendly)
+    let allVenues = [];
+
+    // 1. Sync global community contributions first
+    await syncFirebaseContributions();
+
+    // 2. Try Geoapify Places API first (Primary Source)
     try {
         const data = await fetchGeoapifyVenues(lat, lng, radiusMeters);
         if (data && data.features && data.features.length > 0) {
