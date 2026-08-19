@@ -202,14 +202,23 @@ const DEMO_VENUES = [
 
 window.VENUE_CONTRIBUTIONS = {};
 
-async function syncFirebaseContributions() {
+async function syncFirebaseContributions(venueIds = []) {
     try {
-        if (!window.firebaseDb) return;
-        const snapshot = await window.firebaseDb.collection('contributions').get();
-        snapshot.forEach(doc => {
-            window.VENUE_CONTRIBUTIONS[doc.id] = doc.data();
-        });
-        console.log('Firebase contributions synced globally');
+        if (!window.firebaseDb || venueIds.length === 0) return;
+        
+        // Firestore 'in' query supports max 30 items. Chunk the array.
+        const chunkSize = 30;
+        for (let i = 0; i < venueIds.length; i += chunkSize) {
+            const chunk = venueIds.slice(i, i + chunkSize);
+            const snapshot = await window.firebaseDb.collection('contributions')
+                .where(firebase.firestore.FieldPath.documentId(), 'in', chunk)
+                .get();
+                
+            snapshot.forEach(doc => {
+                window.VENUE_CONTRIBUTIONS[doc.id] = doc.data();
+            });
+        }
+        console.log(`Firebase contributions synced for ${venueIds.length} venues`);
     } catch (e) {
         console.error('Error syncing Firebase contributions:', e);
     }
@@ -425,27 +434,30 @@ function mapOSMToVenue(element, index, userLocationName) {
 
 // ── PRIMARY: Geoapify Places API ───────────────────────────────────
 async function fetchRealVenues(lat, lng, radiusMeters = 3000) {
-    let allVenues = [];
-
-    // 1. Sync global community contributions first
-    await syncFirebaseContributions();
-
-    // 2. Try Geoapify Places API first (Primary Source)
+    // 1. Try Geoapify Places API first (Primary Source)
     try {
         const data = await fetchGeoapifyVenues(lat, lng, radiusMeters);
         if (data && data.features && data.features.length > 0) {
             console.log(`✅ Geoapify returned ${data.features.length} venues`);
+            // Sync ONLY the specific venues on screen to prevent massive read quotas
+            const venueIds = data.features.map((f, i) => `geo-${f.properties.place_id ? f.properties.place_id.substring(0, 16) : i}`);
+            await syncFirebaseContributions(venueIds);
+            
             return { source: 'geoapify', data: data };
         }
     } catch (err) {
         console.warn('Geoapify failed, falling back to Overpass:', err);
     }
 
-    // Fallback to Overpass API
+    // 2. Fallback to Overpass API
     try {
         const data = await fetchOverpassVenues(lat, lng, radiusMeters);
         if (data && data.elements && data.elements.length > 0) {
             console.log(`✅ Overpass returned ${data.elements.length} elements`);
+            // Sync ONLY the specific venues on screen
+            const venueIds = data.elements.map(el => `osm-${el.id}`);
+            await syncFirebaseContributions(venueIds);
+            
             return { source: 'overpass', data: data };
         }
     } catch (err) {
