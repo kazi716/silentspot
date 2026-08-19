@@ -2052,10 +2052,12 @@ function initContributionModal() {
 
             const photoUrl = document.getElementById('contrib-photo').value.trim();
             const wifiSpeed = document.getElementById('contrib-wifi').value;
+            const noiseLevel = document.getElementById('contrib-noise').value;
             const reviewQuote = document.getElementById('contrib-review').value.trim();
 
             if (photoUrl) saveUserContribution(venueId, 'photo', photoUrl);
             if (wifiSpeed) saveUserContribution(venueId, 'wifiSpeed', parseInt(wifiSpeed, 10));
+            if (noiseLevel) saveUserContribution(venueId, 'dbAvg', parseInt(noiseLevel, 10));
             if (reviewQuote) saveUserContribution(venueId, 'review', { quote: reviewQuote, author: 'SilentSpot User' });
 
             modal.classList.add('hidden');

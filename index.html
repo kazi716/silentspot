@@ -806,35 +806,39 @@
                     </button>
                 </div>
                 <p id="contribution-venue-name" class="text-sm text-secondary dark:text-gray-400 mb-5 font-medium"></p>
+                
+                <form id="contribution-form">
+                    <input type="hidden" id="contrib-venue-id">
+                    
+                    <!-- Photo URL -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">📷 Photo URL</label>
+                        <input id="contrib-photo" type="url" placeholder="Paste an image URL of this place..." class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
 
-                <!-- Photo URL -->
-                <div class="mb-4">
-                    <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">📷 Photo URL</label>
-                    <input id="contrib-photo" type="url" placeholder="Paste an image URL of this place..." class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
-                </div>
+                    <!-- Wi-Fi Speed -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">📶 Wi-Fi Speed (Mbps)</label>
+                        <input id="contrib-wifi" type="number" min="0" max="1000" placeholder="e.g. 75" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
 
-                <!-- Wi-Fi Speed -->
-                <div class="mb-4">
-                    <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">📶 Wi-Fi Speed (Mbps)</label>
-                    <input id="contrib-wifi" type="number" min="0" max="1000" placeholder="e.g. 75" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
-                </div>
+                    <!-- Noise Level -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">🔇 Noise Level (dB estimate)</label>
+                        <input id="contrib-noise" type="number" min="0" max="100" placeholder="e.g. 40" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
 
-                <!-- Noise Level -->
-                <div class="mb-4">
-                    <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">🔇 Noise Level (dB estimate)</label>
-                    <input id="contrib-noise" type="number" min="0" max="100" placeholder="e.g. 40" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
-                </div>
+                    <!-- Review -->
+                    <div class="mb-5">
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">💬 Your Review</label>
+                        <textarea id="contrib-review" rows="2" placeholder="Share your experience at this place..." class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
+                    </div>
 
-                <!-- Review -->
-                <div class="mb-5">
-                    <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">💬 Your Review</label>
-                    <textarea id="contrib-review" rows="2" placeholder="Share your experience at this place..." class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
-                </div>
-
-                <button id="btn-save-contribution" class="w-full bg-primary hover:bg-primary-container text-white font-headline-sm text-sm font-semibold py-3 rounded-xl shadow-ambient transition-all flex items-center justify-center gap-2 active:scale-95">
-                    <span class="material-symbols-outlined text-lg">save</span>
-                    Save Contribution
-                </button>
+                    <button type="submit" id="btn-save-contribution" class="w-full bg-primary hover:bg-primary-container text-white font-headline-sm text-sm font-semibold py-3 rounded-xl shadow-ambient transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <span class="material-symbols-outlined text-lg">save</span>
+                        Save Contribution
+                    </button>
+                </form>
             </div>
         </div>
     </div>
