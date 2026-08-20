@@ -483,15 +483,27 @@ async function fetchGeoapifyVenues(lat, lng, radiusMeters) {
 // --- Custom Venues Logic (User-Submitted) ---
 
 async function geocodeAddress(address) {
-    const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&apiKey=${GEOAPIFY_API_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    if (data && data.features && data.features.length > 0) {
-        return {
-            lat: data.features[0].properties.lat,
-            lng: data.features[0].properties.lon,
-            formattedAddress: data.features[0].properties.formatted
-        };
+    try {
+        const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(address)}&limit=1`;
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data && data.features && data.features.length > 0) {
+            const props = data.features[0].properties;
+            const coords = data.features[0].geometry.coordinates; // [lng, lat]
+            
+            // Reconstruct a nice formatted address from Photon data
+            const formatted = [props.name, props.street, props.city, props.state, props.postcode]
+                .filter(Boolean)
+                .join(', ');
+
+            return {
+                lat: coords[1],
+                lng: coords[0],
+                formattedAddress: formatted || address
+            };
+        }
+    } catch (e) {
+        console.warn("Photon geocoding failed:", e);
     }
     return null;
 }
