@@ -433,7 +433,7 @@ function mapOSMToVenue(element, index, userLocationName) {
 }
 
 // ── PRIMARY: Geoapify Places API ───────────────────────────────────
-async function fetchRealVenues(lat, lng, radiusMeters = 3000) {
+async function fetchRealVenues(lat, lng, radiusMeters = 15000) {
     // 1. Try Geoapify Places API first (Primary Source)
     try {
         const data = await fetchGeoapifyVenues(lat, lng, radiusMeters);

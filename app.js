@@ -19,7 +19,7 @@ const state = {
     currentLocation: 'Lower Manhattan, NY',
     currentLat: 40.7185,
     currentLng: -74.0080,
-    maxDistanceRadius: 10.0,
+    maxDistanceRadius: 25.0,
     savedVenueIds: JSON.parse(localStorage.getItem('silentspot_saved_venues') || '[]'),
     activeQuickFilter: 'all',
     searchQuery: '',
@@ -395,10 +395,44 @@ document.addEventListener('DOMContentLoaded', () => {
     initAddVenueModal();
     initLeafletMap();
 
-    // Initial data fetch
-    loadRealVenues(state.currentLat, state.currentLng, state.currentLocation);
+    // Initial data fetch based on IP Geolocation
+    detectUserRegion().then(() => {
+        loadRealVenues(state.currentLat, state.currentLng, state.currentLocation);
+    });
+    
     updateSavedBadge();
 });
+
+// Detect User Region (IP Geolocation)
+async function detectUserRegion() {
+    try {
+        const response = await fetch('https://get.geojs.io/v1/ip/geo.json');
+        if (response.ok) {
+            const data = await response.json();
+            if (data && data.latitude && data.longitude && data.city) {
+                const locName = `${data.city}, ${data.region || data.country}`;
+                const lat = parseFloat(data.latitude);
+                const lng = parseFloat(data.longitude);
+                
+                state.currentLocation = locName;
+                state.currentLat = lat;
+                state.currentLng = lng;
+                
+                // Add to preset locations at the top
+                PRESET_LOCATIONS.unshift({
+                    name: `📍 Your Region: ${locName}`,
+                    lat: lat,
+                    lng: lng
+                });
+                console.log("📍 Detected user region:", locName);
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn("IP Geolocation failed:", e);
+    }
+    console.log("Using default region.");
+}
 
 // Haversine Distance Formula (miles)
 function calcHaversineDistance(lat1, lon1, lat2, lon2) {
@@ -426,7 +460,7 @@ async function loadRealVenues(lat, lng, locationName) {
 
     // 1. Fetch 3rd Party APIs
     try {
-        const result = await fetchRealVenues(lat, lng, 3000);
+        const result = await fetchRealVenues(lat, lng, 15000);
         if (result.source === 'geoapify') {
             newVenues = result.data.features
                 .map((f, i) => mapGeoapifyToVenue(f, i, locationName))
@@ -905,7 +939,10 @@ function switchTab(tabName) {
     // Tab-specific handlers
     if (tabName === 'map') {
         setTimeout(() => {
-            if (state.leafletMap) state.leafletMap.invalidateSize();
+            if (state.leafletMap) {
+                state.leafletMap.invalidateSize();
+                renderMapMarkers();
+            }
         }, 100);
     } else if (tabName === 'compare') {
         renderComparisonTable();
