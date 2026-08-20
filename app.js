@@ -435,15 +435,6 @@ async function loadRealVenues(lat, lng, locationName) {
             // Map Overpass elements to venue objects
             newVenues = result.data.elements
                 .map((el, i) => mapOSMToVenue(el, i, locationName))
-        if (result.source === 'geoapify') {
-            // Map Geoapify features to venue objects
-            newVenues = result.data.features
-                .map((f, i) => mapGeoapifyToVenue(f, i, locationName))
-                .filter(v => v !== null);
-        } else if (result.source === 'overpass') {
-            // Map Overpass elements to venue objects
-            newVenues = result.data.elements
-                .map((el, i) => mapOSMToVenue(el, i, locationName))
                 .filter(v => v !== null);
         }
 
