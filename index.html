@@ -187,6 +187,10 @@
                             <span>Filters</span>
                             <span id="active-filter-count" class="hidden bg-primary-fixed text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
                         </button>
+                        <button id="btn-open-add-venue" class="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shrink-0" title="Add a missing location">
+                            <span class="material-symbols-outlined text-base">add_location_alt</span>
+                            <span class="hidden sm:inline">Add Spot</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -842,6 +846,68 @@
             </div>
         </div>
     </div>
+
+    <!-- ADD CUSTOM VENUE MODAL -->
+    <div id="add-venue-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-3xl shadow-modal border border-outline-variant/30 dark:border-dark-surface-border w-full max-w-md overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="font-headline-sm text-lg font-bold text-on-surface dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">add_location_alt</span>
+                        Add Missing Spot
+                    </h3>
+                    <button id="btn-close-add-venue" class="p-1.5 rounded-full hover:bg-surface-container dark:hover:bg-dark-surface-border transition-colors">
+                        <span class="material-symbols-outlined text-xl text-secondary">close</span>
+                    </button>
+                </div>
+                <p class="text-xs text-secondary dark:text-gray-400 mb-5 leading-relaxed">Can't find your favorite workspace? Add it to the global map! (Photos will be auto-assigned based on category).</p>
+                
+                <form id="add-venue-form">
+                    <!-- Venue Name -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">🏷️ Venue Name *</label>
+                        <input id="add-venue-name" type="text" required placeholder="e.g. The Grind Coffeehouse" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
+
+                    <!-- Address -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">📍 Full Address or Neighborhood *</label>
+                        <input id="add-venue-address" type="text" required placeholder="e.g. 123 Main St, Kolkata" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
+
+                    <!-- Category -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">🏢 Category *</label>
+                        <select id="add-venue-category" required class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                            <option value="cafe">Quiet Café</option>
+                            <option value="library">Library</option>
+                            <option value="coworking">Coworking Space</option>
+                        </select>
+                    </div>
+
+                    <!-- Wi-Fi Speed -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">📶 Initial Wi-Fi Speed (Mbps)</label>
+                        <input id="add-venue-wifi" type="number" min="0" max="1000" placeholder="e.g. 75" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
+
+                    <!-- Noise Level -->
+                    <div class="mb-5">
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">🔇 Initial Noise Level (dB estimate)</label>
+                        <input id="add-venue-noise" type="number" min="0" max="100" placeholder="e.g. 40" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
+                    
+                    <p id="add-venue-error" class="hidden text-xs font-bold text-red-500 mb-3 text-center"></p>
+
+                    <button type="submit" id="btn-save-new-venue" class="w-full bg-primary hover:bg-primary-container text-white font-headline-sm text-sm font-semibold py-3 rounded-xl shadow-ambient transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <span class="material-symbols-outlined text-lg">add_location_alt</span>
+                        Add to Map
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <!-- AUTHENTICATION MODAL -->
     <div id="auth-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-md transition-opacity">
         <div class="bg-surface-container-lowest dark:bg-dark-surface-card rounded-3xl shadow-modal border border-outline-variant/30 dark:border-dark-surface-border w-full max-w-sm overflow-hidden flex flex-col relative">

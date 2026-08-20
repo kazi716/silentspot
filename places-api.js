@@ -480,6 +480,111 @@ async function fetchGeoapifyVenues(lat, lng, radiusMeters) {
     return await response.json();
 }
 
+// --- Custom Venues Logic (User-Submitted) ---
+
+async function geocodeAddress(address) {
+    const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&apiKey=${GEOAPIFY_API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data && data.features && data.features.length > 0) {
+        return {
+            lat: data.features[0].properties.lat,
+            lng: data.features[0].properties.lon,
+            formattedAddress: data.features[0].properties.formatted
+        };
+    }
+    return null;
+}
+
+async function saveCustomVenue(venueData) {
+    if (!window.firebaseDb) throw new Error("Firebase not initialized");
+    
+    // Assign a default photo based on category
+    const pool = VENUE_PHOTO_POOLS[venueData.category] || VENUE_PHOTO_POOLS['cafe'];
+    const randomPhoto = pool[Math.floor(Math.random() * pool.length)];
+    
+    const defaults = VENUE_TYPE_DEFAULTS[venueData.category] || VENUE_TYPE_DEFAULTS['cafe'];
+    
+    const docData = {
+        name: venueData.name,
+        address: venueData.address,
+        lat: venueData.lat,
+        lng: venueData.lng,
+        category: venueData.category,
+        type: defaults.type,
+        dbAvg: venueData.dbAvg || defaults.dbAvg,
+        dbStatus: defaults.dbStatus,
+        wifiSpeed: venueData.wifiSpeed || defaults.wifiSpeed,
+        wifiStatus: defaults.wifiStatus,
+        outletCoverage: defaults.outletCoverage,
+        outletStatus: defaults.outletStatus,
+        seating: defaults.seating,
+        seatingDesc: defaults.seatingDesc,
+        stayPolicy: defaults.stayPolicy,
+        stayPolicyDesc: defaults.stayPolicyDesc,
+        occupancyOptions: defaults.occupancyOptions,
+        occupancyColors: defaults.occupancyColors,
+        hours: 'Hours not listed',
+        image: randomPhoto,
+        amenities: defaults.amenities,
+        feedback: [{ quote: 'Added by the community!', author: 'SilentSpot User' }],
+        isRealData: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    await window.firebaseDb.collection('custom_venues').add(docData);
+}
+
+async function fetchCustomVenues() {
+    if (!window.firebaseDb) return [];
+    try {
+        const snapshot = await window.firebaseDb.collection('custom_venues').get();
+        const customVenues = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            
+            // Reconstruct it as a full venue object for our grid
+            customVenues.push({
+                id: `custom-${doc.id}`,
+                name: data.name,
+                type: data.type,
+                category: data.category,
+                address: data.address,
+                neighborhood: 'Community Added',
+                distance: '...',
+                calculatedDistance: 0,
+                lat: data.lat,
+                lng: data.lng,
+                dbAvg: data.dbAvg,
+                dbRange: VENUE_TYPE_DEFAULTS[data.category]?.dbRange || '40-50',
+                isVerifiedDb: true,
+                dbStatus: data.dbStatus,
+                wifiSpeed: data.wifiSpeed,
+                isVerifiedWifi: true,
+                wifiStatus: data.wifiStatus,
+                outletCoverage: data.outletCoverage,
+                outletStatus: data.outletStatus,
+                seating: data.seating,
+                seatingDesc: data.seatingDesc,
+                stayPolicy: data.stayPolicy,
+                stayPolicyDesc: data.stayPolicyDesc,
+                occupancy: data.occupancyOptions[0],
+                occupancyColor: data.occupancyColors[0],
+                hours: data.hours,
+                image: data.image,
+                amenities: data.amenities,
+                feedback: data.feedback,
+                isRealData: true,
+                isCustom: true // Special flag
+            });
+        });
+        return customVenues;
+    } catch (e) {
+        console.error("Error fetching custom venues:", e);
+        return [];
+    }
+}
+
 // Overpass API call (fallback)
 async function fetchOverpassVenues(lat, lng, radiusMeters) {
     const query = `[out:json][timeout:15];

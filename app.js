@@ -392,6 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initSoundCheck();
     initAmbientAudio();
     initContributionModal();
+    initAddVenueModal();
     initLeafletMap();
 
     // Initial data fetch
@@ -434,7 +435,25 @@ async function loadRealVenues(lat, lng, locationName) {
             // Map Overpass elements to venue objects
             newVenues = result.data.elements
                 .map((el, i) => mapOSMToVenue(el, i, locationName))
+        if (result.source === 'geoapify') {
+            // Map Geoapify features to venue objects
+            newVenues = result.data.features
+                .map((f, i) => mapGeoapifyToVenue(f, i, locationName))
                 .filter(v => v !== null);
+        } else if (result.source === 'overpass') {
+            // Map Overpass elements to venue objects
+            newVenues = result.data.elements
+                .map((el, i) => mapOSMToVenue(el, i, locationName))
+                .filter(v => v !== null);
+        }
+
+        // --- MERGE CUSTOM USER-SUBMITTED VENUES ---
+        try {
+            const customVenues = await fetchCustomVenues();
+            // Append them to the list
+            newVenues = [...newVenues, ...customVenues];
+        } catch (e) {
+            console.error("Failed to load custom venues", e);
         }
 
         if (newVenues.length > 0) {
@@ -2164,4 +2183,86 @@ function openContributionModal(venueId) {
 
     document.getElementById('contribution-form').reset();
     modal.classList.remove('hidden');
+}
+
+// Add Custom Venue Logic
+function initAddVenueModal() {
+    const modal = document.getElementById('add-venue-modal');
+    const openBtn = document.getElementById('btn-open-add-venue');
+    const closeBtn = document.getElementById('btn-close-add-venue');
+    const form = document.getElementById('add-venue-form');
+    const errorText = document.getElementById('add-venue-error');
+
+    if (openBtn) {
+        openBtn.addEventListener('click', () => {
+            if (!state.isLoggedIn) {
+                // Force login if not logged in
+                document.getElementById('auth-modal').classList.remove('hidden');
+                return;
+            }
+            modal.classList.remove('hidden');
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            errorText.classList.add('hidden');
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('btn-save-new-venue');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span> Adding...';
+            submitBtn.disabled = true;
+            errorText.classList.add('hidden');
+
+            try {
+                const name = document.getElementById('add-venue-name').value.trim();
+                const address = document.getElementById('add-venue-address').value.trim();
+                const category = document.getElementById('add-venue-category').value;
+                const wifi = document.getElementById('add-venue-wifi').value;
+                const noise = document.getElementById('add-venue-noise').value;
+
+                // Geocode the address
+                const geoData = await geocodeAddress(address);
+                if (!geoData) {
+                    throw new Error("Could not find this address on the map. Please try a more specific address.");
+                }
+
+                // Construct venue data
+                const venueData = {
+                    name,
+                    address: geoData.formattedAddress,
+                    lat: geoData.lat,
+                    lng: geoData.lng,
+                    category,
+                    wifiSpeed: wifi ? parseInt(wifi, 10) : null,
+                    dbAvg: noise ? parseInt(noise, 10) : null
+                };
+
+                // Save to Firestore
+                await saveCustomVenue(venueData);
+
+                // Success
+                modal.classList.add('hidden');
+                form.reset();
+                alert("Venue added successfully! It is now visible on the map.");
+
+                // Reload map
+                loadRealVenues(state.currentLat, state.currentLng, state.currentLocation);
+            } catch (err) {
+                console.error(err);
+                errorText.textContent = err.message || "Failed to add venue.";
+                errorText.classList.remove('hidden');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
 }
