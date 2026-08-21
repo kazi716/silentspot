@@ -1094,7 +1094,7 @@ function createVenueCardHtml(venue) {
                         </div>
                         <div class="bg-primary/10 dark:bg-primary-fixed-dim/15 px-2.5 py-1.5 rounded-xl text-center min-w-[60px] shrink-0 border border-primary/20 flex flex-col justify-center items-center">
                             <div class="flex items-baseline gap-0.5">
-                                <span class="block font-data-display text-base font-extrabold text-primary dark:text-primary-fixed-dim leading-none">${venue.isVerifiedDb ? venue.dbAvg : venue.dbRange}</span>
+                                <span class="block font-data-display text-base font-extrabold text-primary dark:text-primary-fixed-dim leading-none">${venue.dbAvg !== null ? (venue.isVerifiedDb ? venue.dbAvg : venue.dbRange) : '--'}</span>
                                 <span class="block font-label-caps text-[9px] font-bold text-primary dark:text-primary-fixed-dim uppercase tracking-wider">dB</span>
                             </div>
                             ${venue.isVerifiedDb
@@ -1188,7 +1188,7 @@ function renderCompareMatrix() {
             <td class="p-4 font-semibold text-secondary dark:text-gray-300">Live Noise Level (dB)</td>
             ${visibleVenues.map(v => `
                 <td class="p-4">
-                    <span class="font-data-display font-bold text-base ${v.dbAvg < 40 ? 'text-emerald-600 dark:text-emerald-400' : 'text-yellow-600 dark:text-yellow-400'}">${v.dbAvg} dB</span>
+                    <span class="font-data-display font-bold text-base ${v.dbAvg < 40 ? 'text-emerald-600 dark:text-emerald-400' : 'text-yellow-600 dark:text-yellow-400'}">${v.dbAvg !== null ? v.dbAvg + ' dB' : '--'}</span>
                     <div class="text-[10px] text-secondary">${v.dbStatus}</div>
                 </td>
             `).join('')}
@@ -1197,7 +1197,7 @@ function renderCompareMatrix() {
             <td class="p-4 font-semibold text-secondary dark:text-gray-300">Wi-Fi Speed</td>
             ${visibleVenues.map(v => `
                 <td class="p-4">
-                    <span class="font-data-display font-bold text-sm text-on-surface dark:text-white">${v.wifiSpeed} Mbps</span>
+                    <span class="font-data-display font-bold text-sm text-on-surface dark:text-white">${v.wifiSpeed !== null ? v.wifiSpeed + ' Mbps' : '--'}</span>
                     <div class="text-[10px] text-secondary">${v.wifiStatus}</div>
                 </td>
             `).join('')}
@@ -1613,7 +1613,7 @@ function openVenueDetail(venueId) {
                             </div>
                             <div>
                                 <div class="flex items-baseline gap-1 mb-1">
-                                    <span class="font-data-display text-5xl font-extrabold text-on-surface dark:text-white">${venue.isVerifiedDb ? venue.dbAvg : venue.dbRange}</span>
+                                    <span class="font-data-display text-5xl font-extrabold text-on-surface dark:text-white">${venue.dbAvg !== null ? (venue.isVerifiedDb ? venue.dbAvg : venue.dbRange) : '--'}</span>
                                     <span class="font-data-display text-lg font-bold text-secondary dark:text-gray-400">dB</span>
                                 </div>
                                 <p class="text-xs text-secondary dark:text-gray-400 font-medium">${venue.dbStatus}</p>
@@ -1637,7 +1637,7 @@ function openVenueDetail(venueId) {
         }
                             </div>
                             <div>
-                                <div class="font-data-display text-3xl font-extrabold text-on-surface dark:text-white mb-1">${venue.isVerifiedWifi ? venue.wifiSpeed : '~' + venue.wifiSpeed} Mbps</div>
+                                <div class="font-data-display text-3xl font-extrabold text-on-surface dark:text-white mb-1">${venue.wifiSpeed !== null ? (venue.isVerifiedWifi ? venue.wifiSpeed : '~' + venue.wifiSpeed) + ' Mbps' : '--'}</div>
                                 <span class="inline-block bg-primary/10 dark:bg-primary-fixed-dim/20 text-primary dark:text-primary-fixed-dim px-2.5 py-0.5 rounded text-xs font-bold">${venue.wifiStatus}</span>
                             </div>
                         </div>
