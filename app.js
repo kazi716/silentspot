@@ -19,7 +19,7 @@ const state = {
     currentLocation: 'Lower Manhattan, NY',
     currentLat: 40.7185,
     currentLng: -74.0080,
-    maxDistanceRadius: 25.0,
+    maxDistanceRadius: 5.0,
     savedVenueIds: JSON.parse(localStorage.getItem('silentspot_saved_venues') || '[]'),
     activeQuickFilter: 'all',
     searchQuery: '',
@@ -647,6 +647,18 @@ function initLocationModal() {
     }
 
     // Radius Slider
+    if (radiusSlider && radiusDisplay) {
+        radiusSlider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value).toFixed(1);
+            radiusDisplay.textContent = `${val} miles`;
+            state.maxDistanceRadius = parseFloat(val);
+        });
+        
+        radiusSlider.addEventListener('change', () => {
+            renderVenuesGrid();
+            if (state.currentTab === 'map') renderMapMarkers();
+        });
+    }
 
     // GPS Location Detection Button
     if (gpsBtn) {
