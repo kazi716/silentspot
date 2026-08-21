@@ -2340,6 +2340,7 @@ function initAddVenueModal() {
             }
         });
     }
+}
 // Handle Venue Verification
 window.handleVerifyVenue = async (venueId) => {
     const user = firebase.auth().currentUser;
