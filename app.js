@@ -1044,6 +1044,13 @@ function renderVenuesGrid() {
 
     emptyState.classList.add('hidden');
     grid.innerHTML = filtered.map(venue => createVenueCardHtml(venue)).join('');
+    
+    // Update Banner to reflect filtered count
+    const bannerEl = document.getElementById('success-banner');
+    if (bannerEl && !bannerEl.classList.contains('hidden') && !bannerEl.innerHTML.includes('demo venues')) {
+        const locationName = state.currentLocation || 'your location';
+        bannerEl.innerHTML = '<span class="material-symbols-outlined text-sm">verified</span> Showing <strong>' + filtered.length + ' real places</strong> near ' + locationName;
+    }
 
     // Attach Click Event Listeners
     filtered.forEach(venue => {
@@ -1094,7 +1101,7 @@ function createVenueCardHtml(venue) {
                         </div>
                         <div class="bg-primary/10 dark:bg-primary-fixed-dim/15 px-2.5 py-1.5 rounded-xl text-center min-w-[60px] shrink-0 border border-primary/20 flex flex-col justify-center items-center">
                             <div class="flex items-baseline gap-0.5">
-                                <span class="block font-data-display text-base font-extrabold text-primary dark:text-primary-fixed-dim leading-none">${venue.dbAvg !== null ? (venue.isVerifiedDb ? venue.dbAvg : venue.dbRange) : '--'}</span>
+                                <span class="block font-data-display text-base font-extrabold text-primary dark:text-primary-fixed-dim leading-none">${venue.dbAvg != null ? (venue.isVerifiedDb ? venue.dbAvg : venue.dbRange) : '--'}</span>
                                 <span class="block font-label-caps text-[9px] font-bold text-primary dark:text-primary-fixed-dim uppercase tracking-wider">dB</span>
                             </div>
                             ${venue.isVerifiedDb
@@ -1613,7 +1620,7 @@ function openVenueDetail(venueId) {
                             </div>
                             <div>
                                 <div class="flex items-baseline gap-1 mb-1">
-                                    <span class="font-data-display text-5xl font-extrabold text-on-surface dark:text-white">${venue.dbAvg !== null ? (venue.isVerifiedDb ? venue.dbAvg : venue.dbRange) : '--'}</span>
+                                    <span class="font-data-display text-5xl font-extrabold text-on-surface dark:text-white">${venue.dbAvg != null ? (venue.isVerifiedDb ? venue.dbAvg : venue.dbRange) : '--'}</span>
                                     <span class="font-data-display text-lg font-bold text-secondary dark:text-gray-400">dB</span>
                                 </div>
                                 <p class="text-xs text-secondary dark:text-gray-400 font-medium">${venue.dbStatus}</p>
@@ -1637,7 +1644,7 @@ function openVenueDetail(venueId) {
         }
                             </div>
                             <div>
-                                <div class="font-data-display text-3xl font-extrabold text-on-surface dark:text-white mb-1">${venue.wifiSpeed !== null ? (venue.isVerifiedWifi ? venue.wifiSpeed : '~' + venue.wifiSpeed) + ' Mbps' : '--'}</div>
+                                <div class="font-data-display text-3xl font-extrabold text-on-surface dark:text-white mb-1">${venue.wifiSpeed != null ? (venue.isVerifiedWifi ? venue.wifiSpeed : '~' + venue.wifiSpeed) + ' Mbps' : '--'}</div>
                                 <span class="inline-block bg-primary/10 dark:bg-primary-fixed-dim/20 text-primary dark:text-primary-fixed-dim px-2.5 py-0.5 rounded text-xs font-bold">${venue.wifiStatus}</span>
                             </div>
                         </div>
