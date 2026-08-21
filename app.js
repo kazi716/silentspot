@@ -2274,6 +2274,9 @@ function initAddVenueModal() {
     const form = document.getElementById('add-venue-form');
     const errorText = document.getElementById('add-venue-error');
 
+    let addVenueMap = null;
+    let addVenueMarker = null;
+
     if (openBtn) {
         openBtn.addEventListener('click', () => {
             if (!state.isLoggedIn) {
@@ -2282,6 +2285,22 @@ function initAddVenueModal() {
                 return;
             }
             modal.classList.remove('hidden');
+            
+            // Initialize or update mini map
+            setTimeout(() => {
+                if (!addVenueMap) {
+                    addVenueMap = L.map('add-venue-minimap').setView([state.currentLat, state.currentLng], 14);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        attribution: '&copy; OpenStreetMap'
+                    }).addTo(addVenueMap);
+                    
+                    addVenueMarker = L.marker([state.currentLat, state.currentLng], { draggable: true }).addTo(addVenueMap);
+                } else {
+                    addVenueMap.setView([state.currentLat, state.currentLng], 14);
+                    addVenueMarker.setLatLng([state.currentLat, state.currentLng]);
+                    addVenueMap.invalidateSize();
+                }
+            }, 100);
         });
     }
 
@@ -2309,18 +2328,15 @@ function initAddVenueModal() {
                 const wifi = document.getElementById('add-venue-wifi').value;
                 const noise = document.getElementById('add-venue-noise').value;
 
-                // Geocode the address
-                const geoData = await geocodeAddress(address);
-                if (!geoData) {
-                    throw new Error("Could not find this address on the map. Please try a more specific address.");
-                }
+                // Extract exact GPS coordinates from the dragged map pin
+                const latLng = addVenueMarker.getLatLng();
 
                 // Construct venue data
                 const venueData = {
                     name,
-                    address: geoData.formattedAddress,
-                    lat: geoData.lat,
-                    lng: geoData.lng,
+                    address: address, // user's provided label
+                    lat: latLng.lat,
+                    lng: latLng.lng,
                     category,
                     wifiSpeed: wifi ? parseInt(wifi, 10) : null,
                     dbAvg: noise ? parseInt(noise, 10) : null,

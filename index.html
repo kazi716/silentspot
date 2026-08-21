@@ -875,11 +875,14 @@
                         <input id="add-venue-name" type="text" required placeholder="e.g. The Grind Coffeehouse" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
                     </div>
 
-                    <!-- Address -->
+                    <!-- Interactive Map Picker -->
                     <div class="mb-4">
-                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">📍 Full Address or Neighborhood *</label>
-                        <input id="add-venue-address" type="text" required placeholder="e.g. 123 Main St, Kolkata" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
-                        <p class="text-[10px] text-secondary dark:text-gray-400 mt-1.5 ml-1">Please provide a standard address (e.g. Street, City). Do not use Google Plus Codes or map links.</p>
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">📍 Pin Location on Map *</label>
+                        <div id="add-venue-minimap" class="w-full h-40 rounded-xl bg-surface-container-high border border-outline-variant/30 mb-2 z-0 relative"></div>
+                        <p class="text-[10px] text-secondary dark:text-gray-400 mb-3 ml-1">Drag the map to place the pin exactly on the spot.</p>
+                        
+                        <label class="block text-xs font-semibold text-on-surface dark:text-gray-200 mb-1.5">📝 Locality / Area Name *</label>
+                        <input id="add-venue-address" type="text" required placeholder="e.g. Jangalpara, West Bengal" class="w-full px-3 py-2.5 rounded-xl bg-surface-container dark:bg-dark-surface-border border border-outline-variant/30 dark:border-dark-surface-border text-sm text-on-surface dark:text-gray-200 placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-primary/50">
                     </div>
 
                     <!-- Category -->
