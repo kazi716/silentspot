@@ -2294,7 +2294,14 @@ function initAddVenueModal() {
                         attribution: '&copy; OpenStreetMap'
                     }).addTo(addVenueMap);
                     
-                    addVenueMarker = L.marker([state.currentLat, state.currentLng], { draggable: true }).addTo(addVenueMap);
+                    const pinIcon = L.divIcon({
+                        className: 'add-venue-pin',
+                        html: `<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-size: 36px; text-shadow: 0 2px 4px rgba(0,0,0,0.4); transform: translate(-10px, -30px);">location_on</span>`,
+                        iconSize: [36, 36],
+                        iconAnchor: [18, 36]
+                    });
+
+                    addVenueMarker = L.marker([state.currentLat, state.currentLng], { draggable: true, icon: pinIcon }).addTo(addVenueMap);
                 } else {
                     addVenueMap.setView([state.currentLat, state.currentLng], 14);
                     addVenueMarker.setLatLng([state.currentLat, state.currentLng]);
