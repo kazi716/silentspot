@@ -1516,13 +1516,36 @@ function openVenueDetail(venueId) {
     const isSaved = state.savedVenueIds.includes(venue.id);
     const aiVibe = generateVibeSummary(venue);
 
+    let verificationHtml = '';
+    if (venue.source === 'user_submission') {
+        const verifyCount = venue.verifiedBy ? venue.verifiedBy.length : 1;
+        const isVerified = verifyCount >= 3;
+        
+        const badgeClass = isVerified 
+            ? 'bg-emerald-500/90 text-white border-emerald-400' 
+            : 'bg-white/20 text-white border-white/20';
+            
+        const icon = isVerified ? 'verified_user' : 'group';
+        const label = isVerified ? 'Community Confirmed' : `${verifyCount} Contributors`;
+
+        verificationHtml = `
+            <div class="inline-flex items-center gap-1 self-start ${badgeClass} backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold mb-3 border ml-2">
+                <span class="material-symbols-outlined text-sm">${icon}</span>
+                ${label}
+            </div>
+        `;
+    }
+
     container.innerHTML = `
         <!-- Detail Hero Section -->
         <section class="relative w-full h-[320px] md:h-[480px] rounded-3xl overflow-hidden mb-8 shadow-ambient">
             <img src="${venue.image}" alt="${venue.name}" class="w-full h-full object-cover"/>
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6 md:p-10 flex flex-col justify-end text-white">
-                <div class="inline-flex self-start bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold mb-3 border border-white/20">
-                    ${venue.type}
+                <div>
+                    <div class="inline-flex self-start bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold mb-3 border border-white/20">
+                        ${venue.type}
+                    </div>
+                    ${verificationHtml}
                 </div>
                 <h1 class="font-headline-lg text-2xl md:text-4xl font-bold mb-2">${venue.name}</h1>
                 <p class="text-sm md:text-base text-gray-200">${venue.hours} • Occupancy: <span class="font-bold text-emerald-400">${venue.occupancy}</span></p>
@@ -1552,10 +1575,18 @@ function openVenueDetail(venueId) {
                             <p class="text-xs text-secondary dark:text-gray-400">${venue.neighborhood} (${venue.distance} away)</p>
                         </div>
                     </div>
-                    <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${venue.lat},${venue.lng}', '_blank')" class="px-4 py-2 bg-primary/10 dark:bg-primary-fixed-dim/20 text-primary dark:text-primary-fixed-dim rounded-xl text-xs font-semibold hover:bg-primary/20 transition-colors shrink-0 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-base">directions</span>
-                        Get Directions
-                    </button>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                        ${venue.source === 'user_submission' ? `
+                        <button onclick="window.handleVerifyVenue('${venue.id}')" class="px-4 py-2 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-xl text-xs font-semibold hover:bg-emerald-500/20 transition-colors flex items-center gap-1">
+                            <span class="material-symbols-outlined text-base">verified</span>
+                            Vouch
+                        </button>
+                        ` : ''}
+                        <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${venue.lat},${venue.lng}', '_blank')" class="px-4 py-2 bg-primary/10 dark:bg-primary-fixed-dim/20 text-primary dark:text-primary-fixed-dim rounded-xl text-xs font-semibold hover:bg-primary/20 transition-colors flex items-center gap-1">
+                            <span class="material-symbols-outlined text-base">directions</span>
+                            Directions
+                        </button>
+                    </div>
                 </section>
 
                 <!-- Core Workspace Productivity Bento Grid -->
@@ -2309,4 +2340,16 @@ function initAddVenueModal() {
             }
         });
     }
-}
+// Handle Venue Verification
+window.handleVerifyVenue = async (venueId) => {
+    const user = firebase.auth().currentUser;
+    if (!user) return alert('You must sign in to vouch for a venue.');
+    try {
+        await verifyCustomVenue(venueId, user.uid);
+        alert('Thanks for vouching! The community trust score has been updated.');
+        loadRealVenues(state.currentLat, state.currentLng, state.currentLocation);
+    } catch(err) {
+        console.error(err);
+        alert('Could not verify. You may have already vouched for this spot.');
+    }
+};
