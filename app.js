@@ -458,9 +458,21 @@ async function loadRealVenues(lat, lng, locationName) {
 
     let newVenues = [];
 
-    // 1. Fetch 3rd Party APIs
-    try {
-        const result = await fetchRealVenues(lat, lng, 15000);
+    // 1 & 2. Fetch External APIs and Firestore Custom Venues in PARALLEL
+    const realVenuesPromise = fetchRealVenues(lat, lng, 15000).catch(err => {
+        console.warn('External venue APIs found no results or failed:', err);
+        return null;
+    });
+
+    const customVenuesPromise = fetchCustomVenues().catch(e => {
+        console.error("Failed to load custom venues", e);
+        return [];
+    });
+
+    const [result, customVenues] = await Promise.all([realVenuesPromise, customVenuesPromise]);
+
+    // Process External API Results
+    if (result) {
         if (result.source === 'geoapify') {
             newVenues = result.data.features
                 .map((f, i) => mapGeoapifyToVenue(f, i, locationName))
@@ -470,16 +482,11 @@ async function loadRealVenues(lat, lng, locationName) {
                 .map((el, i) => mapOSMToVenue(el, i, locationName))
                 .filter(v => v !== null);
         }
-    } catch (err) {
-        console.warn('External venue APIs found no results or failed:', err);
     }
 
-    // 2. MERGE CUSTOM USER-SUBMITTED VENUES
-    try {
-        const customVenues = await fetchCustomVenues();
+    // Merge Custom Venues
+    if (customVenues && customVenues.length > 0) {
         newVenues = [...newVenues, ...customVenues];
-    } catch (e) {
-        console.error("Failed to load custom venues", e);
     }
 
     if (newVenues.length > 0) {
