@@ -541,10 +541,23 @@ async function saveCustomVenue(venueData) {
         amenities: defaults.amenities,
         feedback: [{ quote: 'Added by the community!', author: 'SilentSpot User' }],
         isRealData: true,
+        source: 'user_submission',
+        createdBy: venueData.createdBy || 'anonymous',
+        verifiedBy: [venueData.createdBy || 'anonymous'],
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     
     await window.firebaseDb.collection('custom_venues').add(docData);
+}
+
+async function verifyCustomVenue(venueId, uid) {
+    if (!window.firebaseDb) throw new Error("Firebase not initialized");
+    if (!uid) throw new Error("User must be logged in to verify");
+    
+    const venueRef = window.firebaseDb.collection('custom_venues').doc(venueId);
+    await venueRef.update({
+        verifiedBy: firebase.firestore.FieldValue.arrayUnion(uid)
+    });
 }
 
 async function fetchCustomVenues() {

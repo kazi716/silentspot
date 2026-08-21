@@ -2285,7 +2285,8 @@ function initAddVenueModal() {
                     lng: geoData.lng,
                     category,
                     wifiSpeed: wifi ? parseInt(wifi, 10) : null,
-                    dbAvg: noise ? parseInt(noise, 10) : null
+                    dbAvg: noise ? parseInt(noise, 10) : null,
+                    createdBy: firebase.auth().currentUser ? firebase.auth().currentUser.uid : 'anonymous'
                 };
 
                 // Save to Firestore
