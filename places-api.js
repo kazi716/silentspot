@@ -522,7 +522,7 @@ async function saveCustomVenue(venueData) {
         address: venueData.address,
         lat: venueData.lat,
         lng: venueData.lng,
-        geohash: geofireCommon.geohashForLocation([parseFloat(venueData.lat), parseFloat(venueData.lng)]),
+        geohash: window['geofire-common'].geohashForLocation([parseFloat(venueData.lat), parseFloat(venueData.lng)]),
         category: venueData.category,
         type: defaults.type,
         dbAvg: venueData.dbAvg != null ? venueData.dbAvg : null,
@@ -565,7 +565,7 @@ async function fetchCustomVenues(lat, lng, radiusMeters = 15000) {
     if (!window.firebaseDb) return [];
     try {
         const center = [parseFloat(lat), parseFloat(lng)];
-        const bounds = geofireCommon.geohashQueryBounds(center, radiusMeters);
+        const bounds = window['geofire-common'].geohashQueryBounds(center, radiusMeters);
         const promises = [];
         
         for (const b of bounds) {
@@ -584,7 +584,7 @@ async function fetchCustomVenues(lat, lng, radiusMeters = 15000) {
                 const data = doc.data();
                 
                 // Filter false positives (Geohash queries return a bounding box, not a perfect circle)
-                const distanceInKm = geofireCommon.distanceBetween([data.lat, data.lng], center);
+                const distanceInKm = window['geofire-common'].distanceBetween([data.lat, data.lng], center);
                 if (distanceInKm * 1000 > radiusMeters) continue;
                 
                 // Reconstruct it as a full venue object for our grid
