@@ -2384,3 +2384,74 @@ window.handleVerifyVenue = async (venueId) => {
         alert('Could not verify. You may have already vouched for this spot.');
     }
 };
+
+// Web Audio API: Live Mic dB Measurement
+async function initLiveMicMeter() {
+    const btn = document.getElementById("btn-measure-mic");
+    const input = document.getElementById("add-venue-noise");
+    if (!btn || !input) return;
+
+    btn.addEventListener("click", async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+            
+            analyser.fftSize = 512;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Float32Array(bufferLength);
+
+            let isMeasuring = true;
+            let samples = [];
+
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = "<span class=\"material-symbols-outlined text-sm animate-pulse text-red-500\">radio_button_checked</span> Listening...";
+            btn.disabled = true;
+
+            const measure = () => {
+                if (!isMeasuring) return;
+                analyser.getFloatTimeDomainData(dataArray);
+                let sumSquares = 0;
+                for(let i = 0; i < bufferLength; i++) sumSquares += dataArray[i] * dataArray[i];
+                const rms = Math.sqrt(sumSquares / bufferLength);
+                let db = 20 * Math.log10(rms || 0.0001) + 90; 
+                samples.push(db);
+                requestAnimationFrame(measure);
+            };
+            measure();
+
+            setTimeout(() => {
+                isMeasuring = false;
+                stream.getTracks().forEach(track => track.stop());
+                audioContext.close();
+
+                let finalDb = Math.round(samples.reduce((a, b) => a + b, 0) / samples.length);
+                if (finalDb < 30) finalDb = 30;
+                if (finalDb > 100) finalDb = 100;
+
+                input.value = finalDb;
+
+                btn.innerHTML = "<span class=\"material-symbols-outlined text-sm\">check_circle</span> Done";
+                btn.classList.remove("bg-primary/10", "text-primary");
+                btn.classList.add("bg-emerald-500", "text-white");
+                
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                    btn.classList.remove("bg-emerald-500", "text-white");
+                    btn.classList.add("bg-primary/10", "text-primary");
+                }, 2000);
+            }, 3000);
+
+        } catch (err) {
+            console.error("Mic access failed:", err);
+            alert("Could not access microphone.");
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+        }
+    });
+}
+initLiveMicMeter();
+
