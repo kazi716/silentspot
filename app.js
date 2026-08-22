@@ -2455,3 +2455,63 @@ async function initLiveMicMeter() {
 }
 initLiveMicMeter();
 
+// Feedback System
+function initFeedbackSystem() {
+    const modal = document.getElementById('feedback-modal');
+    const openBtn = document.getElementById('btn-open-feedback');
+    const closeBtn = document.getElementById('btn-close-feedback');
+    const form = document.getElementById('feedback-form');
+    const textArea = document.getElementById('feedback-text');
+    const submitBtn = document.getElementById('btn-submit-feedback');
+
+    if (!modal || !openBtn || !form) return;
+
+    openBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        textArea.value = '';
+        textArea.focus();
+    });
+
+    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = textArea.value.trim();
+        if (!text) return;
+
+        const originalBtnHtml = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span> Sending...';
+        submitBtn.disabled = true;
+
+        try {
+            const user = firebase.auth().currentUser;
+            await window.firebaseDb.collection('feedback').add({
+                message: text,
+                uid: user ? user.uid : 'anonymous',
+                email: user ? user.email : 'none',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                userAgent: navigator.userAgent
+            });
+
+            submitBtn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Sent!';
+            submitBtn.classList.replace('bg-primary', 'bg-emerald-500');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                submitBtn.innerHTML = originalBtnHtml;
+                submitBtn.classList.replace('bg-emerald-500', 'bg-primary');
+                submitBtn.disabled = false;
+            }, 1500);
+
+        } catch (error) {
+            console.error("Error sending feedback: ", error);
+            alert("Could not send feedback.");
+            submitBtn.innerHTML = originalBtnHtml;
+            submitBtn.disabled = false;
+        }
+    });
+}
+initFeedbackSystem();
