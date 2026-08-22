@@ -470,7 +470,7 @@ async function loadRealVenues(lat, lng, locationName) {
         return null;
     });
 
-    const customVenuesPromise = fetchCustomVenues().catch(e => {
+    const customVenuesPromise = fetchCustomVenues(lat, lng, 15000).catch(e => {
         console.error("Failed to load custom venues", e);
         return [];
     });

@@ -522,6 +522,7 @@ async function saveCustomVenue(venueData) {
         address: venueData.address,
         lat: venueData.lat,
         lng: venueData.lng,
+        geohash: geofire.geohashForLocation([parseFloat(venueData.lat), parseFloat(venueData.lng)]),
         category: venueData.category,
         type: defaults.type,
         dbAvg: venueData.dbAvg != null ? venueData.dbAvg : null,
@@ -560,16 +561,34 @@ async function verifyCustomVenue(venueId, uid) {
     });
 }
 
-async function fetchCustomVenues() {
+async function fetchCustomVenues(lat, lng, radiusMeters = 15000) {
     if (!window.firebaseDb) return [];
     try {
-        const snapshot = await window.firebaseDb.collection('custom_venues').get();
+        const center = [parseFloat(lat), parseFloat(lng)];
+        const bounds = geofire.geohashQueryBounds(center, radiusMeters);
+        const promises = [];
+        
+        for (const b of bounds) {
+            const q = window.firebaseDb.collection('custom_venues')
+                .orderBy('geohash')
+                .startAt(b[0])
+                .endAt(b[1]);
+            promises.push(q.get());
+        }
+        
+        const snapshots = await Promise.all(promises);
         const customVenues = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            
-            // Reconstruct it as a full venue object for our grid
-            customVenues.push({
+        
+        for (const snap of snapshots) {
+            for (const doc of snap.docs) {
+                const data = doc.data();
+                
+                // Filter false positives (Geohash queries return a bounding box, not a perfect circle)
+                const distanceInKm = geofire.distanceBetween([data.lat, data.lng], center);
+                if (distanceInKm * 1000 > radiusMeters) continue;
+                
+                // Reconstruct it as a full venue object for our grid
+                customVenues.push({
                 id: `custom-${doc.id}`,
                 name: data.name,
                 type: data.type,
@@ -602,7 +621,8 @@ async function fetchCustomVenues() {
                 isRealData: true,
                 isCustom: true // Special flag
             });
-        });
+            } // Close inner for (doc of snap.docs) loop
+        } // Close outer for (snap of snapshots) loop
         return customVenues;
     } catch (e) {
         console.error("Error fetching custom venues:", e);
