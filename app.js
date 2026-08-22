@@ -15,6 +15,7 @@ let VENUES = [];
 
 // App State
 const state = {
+    isInitialAppLoad: true,
     currentTab: 'explore',
     currentLocation: 'Lower Manhattan, NY',
     currentLat: 40.7185,
@@ -406,7 +407,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // Detect User Region (IP Geolocation)
 async function detectUserRegion() {
     try {
-        const response = await fetch('https://get.geojs.io/v1/ip/geo.json');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        
+        const response = await fetch('https://get.geojs.io/v1/ip/geo.json', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
         if (response.ok) {
             const data = await response.json();
             if (data && data.latitude && data.longitude && data.city) {
@@ -429,7 +435,7 @@ async function detectUserRegion() {
             }
         }
     } catch (e) {
-        console.warn("IP Geolocation failed:", e);
+        console.warn("IP Geolocation failed or timed out:", e);
     }
     console.log("Using default region.");
 }
@@ -508,6 +514,17 @@ async function loadRealVenues(lat, lng, locationName) {
 
     // Recalculate distances and render
     setLocation(locationName, lat, lng);
+
+    // Hide Global Splash Screen on initial load (LCP Fix)
+    if (state.isInitialAppLoad) {
+        state.isInitialAppLoad = false;
+        const splash = document.getElementById('global-splash-screen');
+        if (splash) {
+            // Fade out immediately once data is ready
+            splash.classList.add('opacity-0');
+            setTimeout(() => splash.remove(), 300);
+        }
+    }
 }
 
 function loadDemoVenues(lat, lng, locationName, bannerEl) {

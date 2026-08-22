@@ -102,6 +102,25 @@
 </head>
 <body class="bg-background text-on-background dark:bg-dark-bg dark:text-gray-100 font-body-md antialiased pb-24 md:pb-0 min-h-screen transition-colors duration-300">
 
+    <!-- Global Loading Splash Screen (Fixes LCP Web Vitals) -->
+    <div id="global-splash-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background dark:bg-dark-bg transition-opacity duration-500">
+        <div class="relative w-24 h-24 rounded-3xl bg-primary flex items-center justify-center shadow-glow animate-pulse mb-6">
+            <span class="material-symbols-outlined text-5xl text-white">graphic_eq</span>
+        </div>
+        <h1 class="font-headline-lg text-3xl font-bold text-on-surface dark:text-white mb-2 tracking-tight">SilentSpot</h1>
+        <p class="text-secondary dark:text-gray-400 font-medium text-sm flex items-center gap-2">
+            <span class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+            Finding quiet workspaces...
+        </p>
+        <script>
+            // Failsafe: Force remove splash screen after 5 seconds maximum
+            setTimeout(() => {
+                const s = document.getElementById('global-splash-screen');
+                if(s) { s.style.opacity = '0'; setTimeout(() => s.remove(), 500); }
+            }, 5000);
+        </script>
+    </div>
+
     <!-- Header Navigation (Desktop & Mobile TopBar) -->
     <header class="sticky top-0 z-40 w-full bg-background/85 dark:bg-dark-bg/85 backdrop-blur-md border-b border-outline-variant/30 dark:border-dark-surface-border transition-colors">
         <div class="max-w-7xl mx-auto px-container-margin py-3 flex items-center justify-between">
