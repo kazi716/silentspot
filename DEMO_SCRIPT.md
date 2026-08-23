@@ -19,7 +19,7 @@ Notice we don't just show star ratings. We generate a **92/100 Workation Score**
 
 ## 🕒 1:15–1:40 — Machine Learning Prediction
 *(Point to prediction on screen or terminal)*
-"But what about tomorrow? Here is our predicted acoustic level for 10 AM: 41.3 dB. This is generated from our Random Forest model trained on historical acoustic observations, cross-referenced with day and hour features. And we prevent data leakage by doing a strict venue-grouped split to evaluate generalization."
+"Because the live platform does not yet have months of production observations, we generated a synthetic dataset to validate our ML pipeline. Our prototype Random Forest model demonstrates meaningful generalization to previously unseen venues, reducing the error margin from 7.33 dB for a naive baseline down to 4.24 dB. The production system is designed to replace this with real observations as they accumulate."
 
 ## 🕒 1:40–2:00 — The Live Microphone
 *(Click "Sound Check" to open the microphone. Talk loudly to spike the meter).*
