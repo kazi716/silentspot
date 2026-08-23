@@ -3,52 +3,67 @@
 **Targeting:** SIH26207 (Travel & Tourism)
 **Institution:** JIS University
 
-**SilentSpot** is an intelligent Workation Tourism Platform that transforms physical venues into measurable workation destinations. It predicts, measures, and recommends work-friendly environments using acoustic data, connectivity metrics, and geospatial intelligence to support India's rapidly growing remote work economy.
+SilentSpot measures environmental conditions, predicts temporal acoustic patterns, and ranks work-friendly environments using acoustic, connectivity, amenity, and geospatial data to support India's rapidly growing remote work economy.
 
 ---
 
-## 🎯 Hackathon Rubric Alignment
+## 🎯 Key Features
+- **Intelligent Workation Score:** Deterministic ranking based on weighted environmental metrics.
+- **Data Reliability Score:** Transparency heuristic scaling with community verification.
+- **Temporal Acoustic Prediction:** Random Forest model predicting noise fluctuations based on day and hour.
+- **Real-time Community Measurements:** Live Web Audio API integration for instant acoustic feedback.
+- **Geospatial Discovery:** Location-aware venue fetching prioritizing local business discovery.
 
-### 1. UI/UX Design & Usability
-- **Modern Interface:** Tailwind CSS-powered responsive design optimized for mobile-first travelers.
-- **Explainable Metrics:** Mathematical `Workation Score` (0-100) and `Data Reliability` metrics directly exposed in the UI.
+## 🧠 ML Pipeline (Acoustic Prediction)
+Our machine learning pipeline extracts historical acoustic data to predict future noise conditions (e.g., "Predicted acoustic level at 1:00 PM: 64").
 
-### 2. Backend Architecture & Scalability
-- **Live Database:** Firebase Firestore (NoSQL) architecture supporting real-time cross-device synchronization.
-- **Scalable Geospatial Queries:** Implements `geofire-common` to generate 10-character geohashes, restricting database reads to 15km bounding boxes instead of global scans.
-- **Serverless Analytics:** Leaderboard system driven by Firebase user data tracking.
+### Evaluation Methodology
+To prevent data leakage, we utilize a strict **Venue-Grouped Split**, ensuring the model is evaluated exclusively on venues it has never seen during training.
 
-### 3. ML/AI Integration (MLOps)
-- **Temporal Acoustic Prediction:** Implements an ML Pipeline (`ml_pipeline/train_model.py`) using `scikit-learn`.
-- **Model:** Random Forest Regressor trained on historical venue noise data, day of the week, and hour of the day to predict temporal acoustic conditions (e.g., "Expected noise at 1:00 PM: 64 dB").
-- **Evaluation Metrics:** Evaluated against Mean Absolute Error (MAE) and RMSE.
+- **Total Observations:** 15,000
+- **Unique Venues:** 250 (200 Train / 50 Unseen Test)
+- **Naive Baseline (Mean Guess):** MAE: 7.33 dB | R²: -0.003
+- **Random Forest Model:** MAE: 4.24 dB | RMSE: 5.05 dB | R²: 0.688
 
-### 4. Code Quality & Best Practices (DevOps)
-- **VCS & CI/CD:** Hosted on GitHub with Vercel CI/CD pipeline triggering automated deployments on the `master` branch.
-- **Security:** Strict Firebase Security Rules restricting writes to authenticated payloads and validated schemas.
+*Our prototype Random Forest model demonstrates meaningful generalization to previously unseen venues, reducing the error margin (MAE) by ~42% compared to the naive baseline.*
 
-### 5. Problem-Solution Fit
-- **Tourism Economic Impact:** Solves the core problem of digital nomads being unable to verify remote work environments, encouraging longer tourist stays in Tier-2 and Tier-3 cities.
+> **Dataset Note:** Because the live platform does not yet have months of production observations, we generated a synthetic dataset to validate the ML pipeline, features, and evaluation methodology. The production system is designed to seamlessly replace this with real observations as they accumulate.
 
----
+## 🧮 Workation Scoring Engine
+The Workation Score (0-100) is a deterministic weighted average:
+- **35% Acoustic:** Rewards verified quiet environments (< 45 dB).
+- **35% Connectivity:** Rewards high-speed Wi-Fi (> 50 Mbps).
+- **15% Amenities:** Rewards comprehensive power outlet coverage.
+- **15% Reliability:** Rewards recent crowdsourced verification.
 
-## ⚙️ Core Technical Features
-- 📍 **OpenStreetMap & Geoapify:** Global venue discovery fallback algorithms.
-- 🎤 **Web Audio API:** Real-time environmental decibel (dB) sampling via device microphones.
-- 🗺️ **Leaflet.js:** Custom geospatial visualization and dynamic map markers.
+## ⚙️ Backend Architecture & Scalability
+- **Real-Time Database:** Firebase Firestore handles live, cross-device synchronization of community acoustic measurements.
+- **Geohashing:** Implements `geofire-common` with 10-character geohashes and 15km bounding boxes. This limits database reads to the user's relevant geographic region instead of retrieving the global venue dataset, ensuring massive scalability.
+- **Security:** Strict Firebase Security Rules restricting writes to authenticated payloads.
+
+## 🗺️ Tech Stack
+- **Frontend:** Vanilla JavaScript, Tailwind CSS, Leaflet.js (CARTO basemaps)
+- **Backend/Auth:** Firebase Authentication, Firestore
+- **Data APIs:** Geoapify provides structured POI discovery, with OpenStreetMap-based lookup serving as a fallback source.
+- **ML Pipeline:** Python, `pandas`, `scikit-learn`
+- **CI/CD (DevOps):** Vercel auto-deployments linked to GitHub `master` branch.
+
+## ⚠️ Current Limitations
+- **Microphone Calibration:** Acoustic readings from browser microphones are environmental indicators, not calibrated SPL measurements.
+- **Synthetic ML Benchmark:** The current ML evaluation uses synthetic data to validate the architecture while real-world observations accumulate. Prediction quality will be re-evaluated using production data.
+- **Network Dependency:** Connectivity measurements depend heavily on the user's local network/device capabilities.
 
 ---
 
 ## 🚀 Local Development
 
-1. Clone the repository
-2. Run a local web server (e.g., `python -m http.server 5500`)
+1. Clone the repository.
+2. Run a local web server: `python -m http.server 5500`
 3. Open `http://localhost:5500`
 
-## 🧠 MLOps Pipeline Execution
-To train the acoustic prediction model:
+## 🧠 ML Pipeline Execution
+To execute the ML training and evaluation script:
 ```bash
 pip install pandas scikit-learn numpy
 python ml_pipeline/train_model.py
 ```
-This will output model accuracy (MAE/RMSE) and generate `demo_predictions.json`.
