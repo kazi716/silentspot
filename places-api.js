@@ -438,7 +438,7 @@ async function fetchRealVenues(lat, lng, radiusMeters = 15000) {
     try {
         const data = await fetchGeoapifyVenues(lat, lng, radiusMeters);
         if (data && data.features && data.features.length > 0) {
-            console.log(`✅ Geoapify returned ${data.features.length} venues`);
+            console.log(`[Geoapify] returned ${data.features.length} venues`);
             // Sync ONLY the specific venues on screen to prevent massive read quotas
             const venueIds = data.features.map((f, i) => `geo-${f.properties.place_id ? f.properties.place_id.substring(0, 16) : i}`);
             await syncFirebaseContributions(venueIds);
@@ -453,7 +453,7 @@ async function fetchRealVenues(lat, lng, radiusMeters = 15000) {
     try {
         const data = await fetchOverpassVenues(lat, lng, radiusMeters);
         if (data && data.elements && data.elements.length > 0) {
-            console.log(`✅ Overpass returned ${data.elements.length} elements`);
+            console.log(`[Overpass] returned ${data.elements.length} elements`);
             // Sync ONLY the specific venues on screen
             const venueIds = data.elements.map(el => `osm-${el.id}`);
             await syncFirebaseContributions(venueIds);

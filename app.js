@@ -90,7 +90,7 @@ function generateVibeSummary(venue) {
     return vibes[0];
 }
 
-function renderProfileView() {
+async function renderProfileView() {
     const { currentLevel, nextLevel } = getUserLevel(state.totalFocusMinutes);
 
     document.getElementById('profile-focus-minutes').textContent = state.totalFocusMinutes;
@@ -123,28 +123,55 @@ function renderProfileView() {
     }
 
     const leaderboardList = document.getElementById('leaderboard-list');
-    const mockUsers = [
-        { name: "Sarah K.", mins: 1240, level: "Zen Master" },
-        { name: "Alex M.", mins: 850, level: "Deep Worker" },
-        { name: state.userName, mins: state.totalFocusMinutes, level: currentLevel.name, isUser: true },
-        { name: "Jordan T.", mins: 320, level: "Deep Worker" },
-        { name: "Emily R.", mins: 45, level: "Novice" }
+    leaderboardList.innerHTML = `<div class="p-4 text-center text-secondary text-sm"><span class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin inline-block align-middle mr-2"></span>Loading live leaderboard...</div>`;
+
+    let leaderboardUsers = [];
+    
+    // Fallback if offline or Firebase fails
+    const fallbackUsers = [
+        { name: state.userName, mins: state.totalFocusMinutes, isUser: true }
     ];
 
-    mockUsers.sort((a, b) => b.mins - a.mins);
+    try {
+        if (window.firebaseDb) {
+            const snapshot = await window.firebaseDb.collection('users').orderBy('focusMinutes', 'desc').limit(5).get();
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const isCurrentUser = (state.isLoggedIn && state.userEmail === data.email) || (!state.isLoggedIn && data.name === state.userName);
+                leaderboardUsers.push({
+                    name: data.name || "Focus Seeker",
+                    mins: data.focusMinutes || 0,
+                    isUser: isCurrentUser
+                });
+            });
+            
+            // If current user is not in top 5, add them at the bottom so they see themselves
+            if (!leaderboardUsers.some(u => u.isUser)) {
+                leaderboardUsers.push({ name: state.userName, mins: state.totalFocusMinutes, isUser: true });
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to fetch live leaderboard, using local data", e);
+        leaderboardUsers = fallbackUsers;
+    }
 
-    leaderboardList.innerHTML = mockUsers.map((u, i) => `
+    leaderboardUsers.sort((a, b) => b.mins - a.mins);
+
+    leaderboardList.innerHTML = leaderboardUsers.map((u, i) => {
+        const uLevel = getUserLevel(u.mins).currentLevel.name;
+        return `
         <div class="flex items-center justify-between p-4 ${u.isUser ? 'bg-primary/5 dark:bg-primary/10' : ''}">
             <div class="flex items-center gap-4">
                 <div class="font-bold text-secondary dark:text-gray-400 w-4 text-center">#${i + 1}</div>
                 <div>
                     <div class="font-semibold text-sm ${u.isUser ? 'text-primary dark:text-primary-fixed-dim' : 'text-on-surface dark:text-gray-200'}">${u.name}</div>
-                    <div class="text-[10px] text-secondary dark:text-gray-400">${u.level}</div>
+                    <div class="text-[10px] text-secondary dark:text-gray-400">${uLevel}</div>
                 </div>
             </div>
             <div class="font-data-display text-sm font-bold text-on-surface dark:text-white">${u.mins} <span class="text-[10px] font-normal text-secondary">mins</span></div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     renderContributionsList();
     renderProfileSavedGrid();
@@ -2033,8 +2060,7 @@ function initCheckInModal() {
             if (state.checkInSeconds > 0) {
                 // Earn 1 focus minute per minute focused (or at least 1 min if under 1 minute for demo)
                 const earnedMinutes = Math.max(1, Math.floor(state.checkInSeconds / 60));
-                state.totalFocusMinutes += earnedMinutes;
-                localStorage.setItem('silentspot_focus_minutes', state.totalFocusMinutes);
+                syncUserToFirebase(earnedMinutes);
             }
             stopCheckInTimer();
             modal.classList.add('hidden');
@@ -2532,3 +2558,51 @@ function initFeedbackSystem() {
     });
 }
 initFeedbackSystem();
+
+async function syncUserToFirebase(focusMinutesToAdd = 0) {
+    if (!window.firebaseDb) return;
+    try {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            if (focusMinutesToAdd > 0) {
+                state.totalFocusMinutes += focusMinutesToAdd;
+                localStorage.setItem('silentspot_focus_minutes', state.totalFocusMinutes);
+            }
+            return;
+        }
+
+        const userRef = window.firebaseDb.collection('users').doc(user.uid);
+        const doc = await userRef.get();
+        let currentMins = state.totalFocusMinutes;
+
+        if (doc.exists) {
+            currentMins = doc.data().focusMinutes || 0;
+            if (focusMinutesToAdd > 0) {
+                currentMins += focusMinutesToAdd;
+                await userRef.update({ 
+                    focusMinutes: currentMins, 
+                    name: user.displayName || 'Focus Seeker',
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp() 
+                });
+            }
+        } else {
+            if (focusMinutesToAdd > 0) currentMins += focusMinutesToAdd;
+            await userRef.set({
+                name: user.displayName || 'Focus Seeker',
+                email: user.email,
+                focusMinutes: currentMins,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastActive: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+        
+        state.totalFocusMinutes = currentMins;
+        localStorage.setItem('silentspot_focus_minutes', currentMins);
+    } catch (e) {
+        console.error('Firebase user sync error', e);
+        if (focusMinutesToAdd > 0) {
+            state.totalFocusMinutes += focusMinutesToAdd;
+            localStorage.setItem('silentspot_focus_minutes', state.totalFocusMinutes);
+        }
+    }
+}
