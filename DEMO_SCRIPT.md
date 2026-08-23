@@ -4,46 +4,40 @@
 
 ---
 
-## 🕒 Minute 1: The Hook & The Problem
+## 🕒 0:00–0:30 — The Problem
 **(Speaker 1 stands center stage, looking directly at the judges)**
 
-"Good morning judges. We are pitching for SIH26207 under Travel & Tourism.
+"Good morning judges. We are pitching for SIH26207.
 
-I want you to imagine you are a software engineer visiting Goa for a 3-day weekend. Your hotel is great, but suddenly your boss calls—you need to jump on a crucial Zoom call from 9 AM to 1 PM tomorrow. 
+Imagine you're a software engineer visiting Goa for three days. You need to work remotely and take a crucial Zoom call tomorrow morning. Google Maps can tell you where the cafés are. But it *cannot* tell you which one will actually let you work. Remote workers face this problem daily, and it is costing local tourism economies millions in lost digital nomad revenue."
 
-Where do you go? 
-If you open Google Maps, you will see 100 cafés. But Google Maps cannot tell you two critical things: 
-1. Is the Wi-Fi actually stable enough for video calls? 
-2. Is the acoustic environment quiet enough for a meeting, or is there a blender running in the background?
+## 🕒 0:30–1:10 — The Solution
+**(Speaker 2 points to the screen)**
 
-Remote workers and digital nomads face this problem every single day. And because they can’t find reliable workspaces, they don’t travel. This hurts local tourism economies that could otherwise attract high-spending digital nomads."
+"SilentSpot transforms physical venues into measurable workation destinations using acoustic, connectivity, and amenity data.
 
-## 🕒 Minute 2: The Solution & Demo
-**(Speaker 2 points to the screen where the app is open on localhost)**
+*(Point to a venue card on the screen)*
 
-"Enter **SilentSpot**. We have built an Intelligent Workation Tourism Platform. We do not just show you where cafés are. We measure, predict, and recommend venues based on acoustic environments, connectivity, and geospatial data.
+Notice we don't just show star ratings. We generate a **92/100 Workation Score** and an **89% Data Confidence Score**. 
+If you're wondering how we calculate that: it is a weighted algorithmic average. Acoustic environment is 35%, Connectivity is 35%, Amenities are 15%, and the remaining 15% is our Confidence Score—derived from the recency and verification of crowdsourced measurements."
 
-*(Open the Live Site and search for a city like Goa or New Delhi)*
+## 🕒 1:10–2:10 — The Live Demo (Firebase + Mic)
+**(Speaker 2 stops talking. Execute the following actions silently while speaking minimal words.)**
 
-As you can see on our MVP, we generate a highly accurate **Workation Score**. This isn’t a random Google rating. This score is mathematically aggregated from three data points:
-1. Acoustic Decibel Averages
-2. Wi-Fi Speed & Outlet Coverage
-3. Community Data Confidence Scoring
+*(Action 1: Click "Sound Check" to open the microphone).*
+"We don't guess noise levels. We measure them."
 
-But how do we get this acoustic data? We don’t guess. We measure it."
+*(Action 2: Talk loudly to spike the meter, then submit the venue data).*
+**Anticipated Judge Question:** *"Your phone microphone isn't a calibrated sound-level meter. How can you claim dB?"*
+**Your Response:** *"You're exactly right. The browser measurement is an acoustic indicator rather than a certified SPL measurement. We normalize these readings and attach a confidence score. Our Phase 2 architecture introduces calibrated Raspberry Pi sensors for higher-fidelity continuous measurements."*
 
-*(Speaker 2 clicks the "🎙️ Sound Check" button on the app)*
+*(Action 3: Have a teammate on a SECOND laptop instantly refresh their screen or look at the leaderboard/venue).*
+"This isn't a prototype with static JSON. Laptop A just submitted a measurement, and Laptop B immediately received the updated data through our live Firebase backend. Our community data is actively synchronizing."
 
-"We have integrated the browser’s Web Audio API to turn any tourist’s laptop or phone into a live decibel meter. If I talk loudly into my microphone right now, you will see the dB meter spike. When tourists visit a café, they run this test, and the acoustic data is securely verified and crowdsourced to our Firebase architecture."
-
-## 🕒 Minute 3: The Roadmap & AI (The Showstopper)
+## 🕒 2:10–2:40 — Why It Matters
 **(Speaker 1 takes over)**
 
-"For this university selection, you are looking at a fully deployed MVP built on Firebase, utilizing Geohashing for scalable spatial queries. 
+"SilentSpot isn't simply helping people find cafés. We're building the data infrastructure for India's emerging workation economy—helping travelers discover suitable places to work while helping lesser-known local businesses become discoverable to high-spending digital nomads."
 
-But if we are selected for the SIH Finale, we are taking this to the enterprise level. We will implement **Temporal Intelligence**. 
-Instead of just saying a café is 45 dB, SilentSpot will use historical data to tell the tourist: *'This café is quietest from 9:30 AM to 12:30 PM.'*
-
-We are also planning an IoT hardware extension—distributing cheap Raspberry Pi decibel meters to local cafés to stream 24/7 noise data directly to our map. 
-
-SilentSpot isn’t just a map. It’s the data infrastructure needed to turn India into the ultimate Workation destination. Thank you."
+## 🕒 2:40–3:00 — The Future
+"Our next phase introduces temporal intelligence: learning how each venue behaves throughout the day (morning vs. evening), followed by predictive ML recommendations, and calibrated IoT sensors. Thank you."
