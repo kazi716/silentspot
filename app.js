@@ -77,8 +77,10 @@ function generateVibeSummary(venue) {
     const isPower = venue.outletCoverage >= 70;
 
     let vibes = [];
-    if (isQuiet && isFast) vibes.push("Ultimate productivity sanctuary");
-    else if (isQuiet) vibes.push("Library-like hush for deep work");
+    if (venue.category === 'library') vibes.push("Silent academic environment for deep reading");
+    else if (venue.category === 'coworking') vibes.push("Professional hub for focused digital work");
+    else if (isQuiet && isFast) vibes.push("Ultimate productivity sanctuary");
+    else if (isQuiet) vibes.push("Calm and muted atmosphere for deep work");
     else if (isFast) vibes.push("High-speed hub with energetic chatter");
     else vibes.push("Casual spot for light reading");
 
@@ -89,6 +91,7 @@ function generateVibeSummary(venue) {
 
     return vibes[0];
 }
+
 
 async function renderProfileView() {
     const { currentLevel, nextLevel } = getUserLevel(state.totalFocusMinutes);
@@ -1118,12 +1121,12 @@ function createVenueCardHtml(venue) {
     const bookmarkClass = isSaved ? 'text-primary dark:text-primary-fixed-dim' : 'text-secondary hover:text-primary';
 
     // ---------------------------------------------------------
-    // 1. DATA CONFIDENCE FORMULA (Explainable for Judges)
+    // 1. Data Reliability FORMULA (Explainable for Judges)
     // Base 60% for OSM/Geoapify data. +25% for recent community verification. +10% for high data completeness.
     // ---------------------------------------------------------
-    let confidenceScore = venue.isRealData ? 65 : 40; 
-    if (venue.isVerifiedDb) confidenceScore += 25; // Community verified
-    if (venue.wifiSpeed > 0 && venue.outletCoverage > 0) confidenceScore += 5;
+    let reliabilityScore = venue.isRealData ? 65 : 40; 
+    if (venue.isVerifiedDb) reliabilityScore += 25; // Community verified
+    if (venue.wifiSpeed > 0 && venue.outletCoverage > 0) reliabilityScore += 5;
     
     // ---------------------------------------------------------
     // 2. WORKATION SCORE FORMULA (Weighted Average)
@@ -1148,7 +1151,7 @@ function createVenueCardHtml(venue) {
         (acousticScore * 0.35) + 
         (wifiScore * 0.35) + 
         (outletScore * 0.15) + 
-        (confidenceScore * 0.15)
+        (reliabilityScore * 0.15)
     );
 
     return `
@@ -1195,8 +1198,8 @@ function createVenueCardHtml(venue) {
                             <span class="font-data-display text-xs font-black text-emerald-600 dark:text-emerald-400">${workationScore}/100</span>
                         </div>
                         <div class="flex-1 px-2 py-1.5 bg-gradient-to-r from-blue-500/10 to-transparent border-l-2 border-blue-500 rounded-r flex items-center justify-between">
-                            <span class="text-[9px] font-bold text-secondary dark:text-gray-300 uppercase tracking-wider">Data Confidence</span>
-                            <span class="font-data-display text-xs font-black text-blue-600 dark:text-blue-400">${confidenceScore}%</span>
+                            <span class="text-[9px] font-bold text-secondary dark:text-gray-300 uppercase tracking-wider">Data Reliability</span>
+                            <span class="font-data-display text-xs font-black text-blue-600 dark:text-blue-400">${reliabilityScore}%</span>
                         </div>
                     </div>
 
@@ -2645,3 +2648,4 @@ async function syncUserToFirebase(focusMinutesToAdd = 0) {
         }
     }
 }
+

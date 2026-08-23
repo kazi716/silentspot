@@ -4,40 +4,33 @@
 
 ---
 
-## 🕒 0:00–0:30 — The Problem
-**(Speaker 1 stands center stage, looking directly at the judges)**
-
+## 🕒 0:00–0:25 — The Problem
 "Good morning judges. We are pitching for SIH26207.
 
-Imagine you're a software engineer visiting Goa for three days. You need to work remotely and take a crucial Zoom call tomorrow morning. Google Maps can tell you where the cafés are. But it *cannot* tell you which one will actually let you work. Remote workers face this problem daily, and it is costing local tourism economies millions in lost digital nomad revenue."
+Imagine you're a software engineer visiting Goa tomorrow. You need somewhere *reliable* to work and take a Zoom call. Google Maps tells you where the cafés are. But it *cannot* tell you whether you'll actually be able to work there. Remote workers face this problem daily, and it is costing local tourism economies millions."
 
-## 🕒 0:30–1:10 — The Solution
-**(Speaker 2 points to the screen)**
-
-"SilentSpot transforms physical venues into measurable workation destinations using acoustic, connectivity, and amenity data.
-
+## 🕒 0:25–0:45 — The Solution (SilentSpot)
+"SilentSpot transforms physical venues into measurable workation destinations. 
 *(Point to a venue card on the screen)*
+Notice we don't just show star ratings. We generate a **92/100 Workation Score** and a **95% Data Reliability Score**."
 
-Notice we don't just show star ratings. We generate a **92/100 Workation Score** and an **89% Data Confidence Score**. 
-If you're wondering how we calculate that: it is a weighted algorithmic average. Acoustic environment is 35%, Connectivity is 35%, Amenities are 15%, and the remaining 15% is our Confidence Score—derived from the recency and verification of crowdsourced measurements."
+## 🕒 0:45–1:15 — The Score Breakdown
+"If you're wondering how we calculate that: it is a deterministic weighted formula. Acoustic environment is 35%, Connectivity is 35%, Amenities are 15%, and the remaining 15% is our Reliability Score—derived from the recency and community verification of the measurements."
 
-## 🕒 1:10–2:10 — The Live Demo (Firebase + Mic)
-**(Speaker 2 stops talking. Execute the following actions silently while speaking minimal words.)**
+## 🕒 1:15–1:40 — Machine Learning Prediction
+*(Point to prediction on screen or terminal)*
+"But what about tomorrow? Here is our predicted acoustic level for 10 AM: 41.3 dB. This is generated from our Random Forest model trained on historical acoustic observations, cross-referenced with day and hour features. And we prevent data leakage by doing a strict venue-grouped split to evaluate generalization."
 
-*(Action 1: Click "Sound Check" to open the microphone).*
-"We don't guess noise levels. We measure them."
+## 🕒 1:40–2:00 — The Live Microphone
+*(Click "Sound Check" to open the microphone. Talk loudly to spike the meter).*
+"We don't guess noise levels. We measure them using the Web Audio API. The browser measurement is an acoustic indicator, and we attach a data reliability score to our observations."
 
-*(Action 2: Talk loudly to spike the meter, then submit the venue data).*
-**Anticipated Judge Question:** *"Your phone microphone isn't a calibrated sound-level meter. How can you claim dB?"*
-**Your Response:** *"You're exactly right. The browser measurement is an acoustic indicator rather than a certified SPL measurement. We normalize these readings and attach a confidence score. Our Phase 2 architecture introduces calibrated Raspberry Pi sensors for higher-fidelity continuous measurements."*
+## 🕒 2:00–2:25 — Real-time Firebase Sync (Engineering Flex)
+*(Laptop A submits measurement. Point to Laptop B).*
+"This isn't a prototype with static data. Laptop A just submitted a measurement, and Laptop B immediately received the updated data through our live Firebase backend. Our community data actively synchronizes globally."
 
-*(Action 3: Have a teammate on a SECOND laptop instantly refresh their screen or look at the leaderboard/venue).*
-"This isn't a prototype with static JSON. Laptop A just submitted a measurement, and Laptop B immediately received the updated data through our live Firebase backend. Our community data is actively synchronizing."
+## 🕒 2:25–2:45 — The Impact & The Moat
+"Why can't Google Maps do this? Because Google Maps primarily describes places. SilentSpot *measures how suitable those places are for a specific work context over time.* It's the combination of acoustic data, temporal patterns, and community verification."
 
-## 🕒 2:10–2:40 — Why It Matters
-**(Speaker 1 takes over)**
-
-"SilentSpot isn't simply helping people find cafés. We're building the data infrastructure for India's emerging workation economy—helping travelers discover suitable places to work while helping lesser-known local businesses become discoverable to high-spending digital nomads."
-
-## 🕒 2:40–3:00 — The Future
-"Our next phase introduces temporal intelligence: learning how each venue behaves throughout the day (morning vs. evening), followed by predictive ML recommendations, and calibrated IoT sensors. Thank you."
+## 🕒 2:45–3:00 — The Future
+"Our next phase adds temporal intelligence, calibrated IoT sensors, and personalized recommendations. Thank you."

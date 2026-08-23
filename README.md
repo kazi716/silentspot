@@ -11,7 +11,7 @@
 
 ### 1. UI/UX Design & Usability
 - **Modern Interface:** Tailwind CSS-powered responsive design optimized for mobile-first travelers.
-- **Explainable Metrics:** Mathematical `Workation Score` (0-100) and `Data Confidence` metrics directly exposed in the UI.
+- **Explainable Metrics:** Mathematical `Workation Score` (0-100) and `Data Reliability` metrics directly exposed in the UI.
 
 ### 2. Backend Architecture & Scalability
 - **Live Database:** Firebase Firestore (NoSQL) architecture supporting real-time cross-device synchronization.
