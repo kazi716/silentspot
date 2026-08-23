@@ -1,55 +1,54 @@
-# 🎧 SilentSpot - Find Your Focus
+# 🎙️ SilentSpot - Workation Tourism Intelligence Platform
 
-**SilentSpot** is a modern web application designed for remote workers, students, and digital nomads to discover quiet workspaces, cafés, and libraries based on acoustic environments and technical amenities. 
+**Targeting:** SIH26207 (Travel & Tourism)
+**Institution:** JIS University
 
-Stop guessing where you can take a quiet meeting or do deep work. SilentSpot provides data-driven venue intelligence, from ambient decibel (dB) averages to Wi-Fi speeds and power outlet coverage.
-
----
-
-## ✨ Key Features
-
-- 🤫 **Intelligent Venue Discovery**: Filter workspaces by noise level (<45 dB), Wi-Fi speed (100+ Mbps), power outlets, and venue type (Café, Library, Coworking).
-- 🗺️ **Global Coverage**: Powered by the **Geoapify Places API** and **OpenStreetMap**, search any city globally to auto-discover quiet focus spots with beautiful CARTO map tiles.
-- 📡 **Live Community Database**: Built on **Firebase Firestore**, community members can drop pins, add new quiet workspaces, and verify existing Wi-Fi speeds and acoustic readings anywhere in the world.
-- ⚡ **Global Geohashing**: Scalable map architecture utilizing **Geofire** to query Firestore via 15km geohashed bounding boxes, ensuring lightning-fast database reads globally.
-- 🎙️ **Live dB Sound Check**: Built-in room noise meter utilizing the Web Audio API and microphone input to measure your current environment's acoustic profile.
-- 📊 **Workspace Comparison Matrix**: Side-by-side technical and acoustic comparison engine.
-- 🎧 **Focus Audio Synthesizer**: Built-in ambient noise generator (Rain, Lo-fi Café, Ocean Waves, Alpha Waves) to help you zone in anywhere.
-- 🚀 **Performance Optimized**: Achieves a near-perfect Vercel Web Vitals score through intelligent LCP (Largest Contentful Paint) splash screen rendering and aggressive API failsafes.
+**SilentSpot** is an intelligent Workation Tourism Platform that transforms physical venues into measurable workation destinations. It predicts, measures, and recommends work-friendly environments using acoustic data, connectivity metrics, and geospatial intelligence to support India's rapidly growing remote work economy.
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## 🎯 Hackathon Rubric Alignment
 
-- **Frontend**: HTML5, Vanilla JavaScript, Tailwind CSS (CDN for rapid prototyping)
-- **Backend & Database**: Firebase Authentication & Firebase Firestore (NoSQL)
-- **Mapping & GIS**: Leaflet.js, CARTO Basemaps (Positron & Dark Matter), Geofire (Geohashing)
-- **Data APIs**: 
-  - **Geoapify Places API** (Primary source for rich, structured POI data)
-  - **Overpass API / OpenStreetMap** (Robust global fallback engine)
-  - **Photon by Komoot** (Global city autocomplete & geocoding)
-  - **GeoJS** (Silent IP Geolocation)
-- **Analytics**: Vercel Web Analytics & Vercel Speed Insights
+### 1. UI/UX Design & Usability
+- **Modern Interface:** Tailwind CSS-powered responsive design optimized for mobile-first travelers.
+- **Explainable Metrics:** Mathematical `Workation Score` (0-100) and `Data Confidence` metrics directly exposed in the UI.
+
+### 2. Backend Architecture & Scalability
+- **Live Database:** Firebase Firestore (NoSQL) architecture supporting real-time cross-device synchronization.
+- **Scalable Geospatial Queries:** Implements `geofire-common` to generate 10-character geohashes, restricting database reads to 15km bounding boxes instead of global scans.
+- **Serverless Analytics:** Leaderboard system driven by Firebase user data tracking.
+
+### 3. ML/AI Integration (MLOps)
+- **Temporal Acoustic Prediction:** Implements an ML Pipeline (`ml_pipeline/train_model.py`) using `scikit-learn`.
+- **Model:** Random Forest Regressor trained on historical venue noise data, day of the week, and hour of the day to predict temporal acoustic conditions (e.g., "Expected noise at 1:00 PM: 64 dB").
+- **Evaluation Metrics:** Evaluated against Mean Absolute Error (MAE) and RMSE.
+
+### 4. Code Quality & Best Practices (DevOps)
+- **VCS & CI/CD:** Hosted on GitHub with Vercel CI/CD pipeline triggering automated deployments on the `master` branch.
+- **Security:** Strict Firebase Security Rules restricting writes to authenticated payloads and validated schemas.
+
+### 5. Problem-Solution Fit
+- **Tourism Economic Impact:** Solves the core problem of digital nomads being unable to verify remote work environments, encouraging longer tourist stays in Tier-2 and Tier-3 cities.
 
 ---
 
-## 🚀 Setup & Local Preview
+## ⚙️ Core Technical Features
+- 📍 **OpenStreetMap & Geoapify:** Global venue discovery fallback algorithms.
+- 🎤 **Web Audio API:** Real-time environmental decibel (dB) sampling via device microphones.
+- 🗺️ **Leaflet.js:** Custom geospatial visualization and dynamic map markers.
 
-Clone the repository and run a simple local HTTP server:
+---
 
+## 🚀 Local Development
+
+1. Clone the repository
+2. Run a local web server (e.g., `python -m http.server 5500`)
+3. Open `http://localhost:5500`
+
+## 🧠 MLOps Pipeline Execution
+To train the acoustic prediction model:
 ```bash
-git clone https://github.com/kazi716/silentspot.git
-cd silentspot
-python -m http.server 5500
+pip install pandas scikit-learn numpy
+python ml_pipeline/train_model.py
 ```
-
-Open `http://localhost:5500` in your browser to view the application.
-
----
-
-## 🤝 Contributing
-Found a great quiet spot? Use the in-app **Add a Spot** feature to drop a pin, submit verified Wi-Fi speeds, and log acoustic dB readings to help the community find focus!
-
----
-
-*Designed and developed by Kazi Md Samim Faraj for the remote work community.*
+This will output model accuracy (MAE/RMSE) and generate `demo_predictions.json`.
