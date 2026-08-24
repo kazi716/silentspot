@@ -34,6 +34,16 @@ SilentSpot is a Workation Tourism Intelligence Platform that helps remote worker
 - **Real-time Community Measurements:** Live Web Audio API integration for instant acoustic feedback.
 - **Geospatial Discovery:** Location-aware venue fetching prioritizing local business discovery.
 
+
+
+## 🧮 Workation Scoring Engine
+The Workation Score (0-100) is a deterministic weighted average:
+- **35% Acoustic:** Rewards verified quiet environments (< 45 dB).
+- **35% Connectivity:** Rewards high-speed Wi-Fi (> 50 Mbps).
+- **15% Amenities:** Rewards comprehensive power outlet coverage.
+- **15% Reliability:** Rewards recent crowdsourced verification.
+
+
 ## 🧠 ML Pipeline (Acoustic Prediction)
 Our machine learning pipeline extracts historical acoustic data to predict future noise conditions (e.g., "Predicted acoustic level at 1:00 PM: 64").
 
@@ -48,13 +58,7 @@ To prevent data leakage, we utilize a strict **Venue-Grouped Split**, ensuring t
 *Our prototype Random Forest model demonstrates meaningful generalization to previously unseen venues, reducing the error margin (MAE) by ~42% compared to the naive baseline.*
 
 > **Dataset Note:** Because the live platform does not yet have months of production observations, we generated a synthetic dataset to validate the ML pipeline, features, and evaluation methodology. The production system is designed to seamlessly replace this with real observations as they accumulate.
-
-## 🧮 Workation Scoring Engine
-The Workation Score (0-100) is a deterministic weighted average:
-- **35% Acoustic:** Rewards verified quiet environments (< 45 dB).
-- **35% Connectivity:** Rewards high-speed Wi-Fi (> 50 Mbps).
-- **15% Amenities:** Rewards comprehensive power outlet coverage.
-- **15% Reliability:** Rewards recent crowdsourced verification.
+> 
 
 ## ⚙️ Backend Architecture & Scalability
 - **Real-Time Database:** Firebase Firestore handles live, cross-device synchronization of community acoustic measurements.
