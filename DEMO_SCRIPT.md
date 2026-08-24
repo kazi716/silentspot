@@ -29,7 +29,7 @@ Notice we don't just show star ratings. We generate a **92/100 Workation Score**
 *(Laptop A submits measurement. Point to Laptop B).*
 "This isn't a prototype with static data. Laptop A just submitted a measurement, and Laptop B immediately received the updated data through our live Firebase backend. Our community data actively synchronizes globally."
 
-## 🕒 2:25–2:45 — The Impact & The Moat
+## 🕒 2:25–2:45 — The Impact & Advantage
 "Why can't Google Maps do this? Because Google Maps primarily describes places. SilentSpot *measures how suitable those places are for a specific work context over time.* It's the combination of acoustic data, temporal patterns, and community verification."
 
 ## 🕒 2:45–3:00 — The Future
