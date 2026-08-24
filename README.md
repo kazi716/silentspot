@@ -1,12 +1,32 @@
 # 🎙️ SilentSpot - Workation Tourism Intelligence Platform
 
-**Targeting:** SIH26207 (Travel & Tourism)
-**Institution:** JIS University
+### 🎯 Targeting
 
-SilentSpot measures environmental conditions, predicts temporal acoustic patterns, and ranks work-friendly environments using acoustic, connectivity, amenity, and geospatial data to support India's rapidly growing remote work economy.
+**Problem Statement ID:** 26207<br>
+**Problem Statement Title:** Student Innovation<br>
+**Theme:** Travel & Tourism<br>
+**PS Category:** Software<br>
+**Description:** Technology ideas in tertiary sectors such as Hospitality, Financial Services, Entertainment, and Retail.<br>
+**Institution:** JIS University<br>
+**Team ID:**<br>
+**Team Name:** vibe coders <br>
 
 ---
+🎯 Problem
 
+Remote workers, students, and digital nomads often struggle to identify quiet, reliable, and work-friendly spaces while travelling. Existing platforms provide information about places but do not offer real-time insights into noise levels, Wi-Fi quality, workspace amenities, or time-based environmental conditions.
+
+💡 Solution
+
+SilentSpot is a Workation Tourism Intelligence Platform that analyzes acoustic conditions, connectivity, amenities, reliability, and geospatial data to identify and rank work-friendly locations. Using community-driven measurements and machine learning-based acoustic prediction, it helps users discover suitable places to work and travel with confidence.
+
+
+**Short Overview**
+<h5>
+SilentSpot is a Workation Tourism Intelligence Platform that helps remote workers, students, and digital nomads discover and evaluate work-friendly places. It analyzes acoustic conditions, Wi-Fi connectivity, amenities, reliability, and location data to generate an intelligent Workation Score and predict how noise levels may change over time. By combining community-driven measurements, machine learning, and geospatial intelligence, SilentSpot makes it easier to find productive and comfortable places to work while exploring new destinations
+</h5>
+
+---
 ## 🎯 Key Features
 - **Intelligent Workation Score:** Deterministic ranking based on weighted environmental metrics.
 - **Data Reliability Score:** Transparency heuristic scaling with community verification.
