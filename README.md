@@ -85,10 +85,6 @@ To prevent data leakage, we utilize a strict **Venue-Grouped Split**, ensuring t
 - **ML Pipeline:** Python, `pandas`, `scikit-learn`
 - **CI/CD (DevOps):** Vercel auto-deployments linked to GitHub `master` branch.
 
-## ⚠️ Current Limitations
-- **Microphone Calibration:** Acoustic readings from browser microphones are environmental indicators, not calibrated SPL measurements.
-- **Synthetic ML Benchmark:** The current ML evaluation uses synthetic data to validate the architecture while real-world observations accumulate. Prediction quality will be re-evaluated using production data.
-- **Network Dependency:** Connectivity measurements depend heavily on the user's local network/device capabilities.
 
 ---
 ▶️**Watch the Demo Video** <br>
@@ -98,6 +94,13 @@ To prevent data leakage, we utilize a strict **Venue-Grouped Split**, ensuring t
 📁 **Google Drive:** [Watch on Google Drive] https://drive.google.com/drive/folders/1TTFksyMKfZ9P9aclIaCgXqmUhu6qicHF?usp=sharing  <br>
 
 ---
+## ⚠️ Current Limitations
+- **Microphone Calibration:** Acoustic readings from browser microphones are environmental indicators, not calibrated SPL measurements.
+- **Synthetic ML Benchmark:** The current ML evaluation uses synthetic data to validate the architecture while real-world observations accumulate. Prediction quality will be re-evaluated using production data.
+- **Network Dependency:** Connectivity measurements depend heavily on the user's local network/device capabilities.
+
+---
+
 ## 🚀 Local Development
 
 1. Clone the repository.
