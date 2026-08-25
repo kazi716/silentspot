@@ -1,25 +1,38 @@
+# **Vibe-Coders**
 # 🎙️ SilentSpot - Workation Tourism Intelligence Platform
 
-### 🎯 Targeting
+### 🎯 **Targeting**
 
-**Problem Statement ID:** 26207<br>
-**Problem Statement Title:** Student Innovation<br>
+**Problem Statement ID:** 26204<br>
+**Problem Statement Title:** Student Innovation-A solution/idea that can boost the current situation of the tourism industries including hotels, travel and others.<br>
 **Theme:** Travel & Tourism<br>
 **PS Category:** Software<br>
 **Description:** Technology ideas in tertiary sectors such as Hospitality, Financial Services, Entertainment, and Retail.<br>
 **Institution:** JIS University<br>
 **Team ID:**<br>
-**Team Name:** vibe coders <br>
+**Team Name:** vibe-coders <br>
 
 ---
-🎯 Problem
+🎯 **Problem** <br>
 
-Remote workers, students, and digital nomads often struggle to identify quiet, reliable, and work-friendly spaces while travelling. Existing platforms provide information about places but do not offer real-time insights into noise levels, Wi-Fi quality, workspace amenities, or time-based environmental conditions.
+Finding a place is easy. Finding a good place to work is not. <br>
+While travelling, people may need a place to work or attend an important meeting: <br>
 
-💡 Solution
+• Employees on vacation may need to attend an urgent company meeting. <br>
+• Business traveller may need a place to work between meetings. <br>
+• Digital nomads and remote workers need a good place to work. <br>
+• Traveller may need a quiet place for an important video call. <br>
 
-SilentSpot is a Workation Tourism Intelligence Platform that analyzes acoustic conditions, connectivity, amenities, reliability, and geospatial data to identify and rank work-friendly locations. Using community-driven measurements and machine learning-based acoustic prediction, it helps users discover suitable places to work and travel with confidence.
+**Existing maps often do not tell:** <br>
+• Is the place quiet? <br>
+• Is the internet good? <br>
+• Are power outlets available?
+• Will the place be noisy at a particular time? <br>
+• Is the information recent and reliable? <br>
 
+💡 **Solution** <br>
+
+SilentSpot is a Workation Tourism Intelligence Platform that analyzes acoustic conditions, connectivity, amenities, reliability, and geospatial data to identify and rank work-friendly locations. Using community-driven measurements and machine learning-based acoustic prediction, it helps users discover suitable places to work and travel with confidence.<br>
 
 **Short Overview**
 <h5>
@@ -78,7 +91,13 @@ To prevent data leakage, we utilize a strict **Venue-Grouped Split**, ensuring t
 - **Network Dependency:** Connectivity measurements depend heavily on the user's local network/device capabilities.
 
 ---
+▶️**Watch the Demo Video** <br>
 
+**YouTube:** [Watch on YouTube] https://www.youtube.com/watch?v=oDWZ_CSJRcg   <br>
+
+📁 **Google Drive:** [Watch on Google Drive] https://drive.google.com/drive/folders/1TTFksyMKfZ9P9aclIaCgXqmUhu6qicHF?usp=sharing  <br>
+
+---
 ## 🚀 Local Development
 
 1. Clone the repository.
