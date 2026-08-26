@@ -1,7 +1,7 @@
 # **Vibe-Coders**
 # 🎙️ SilentSpot - Workation Tourism Intelligence Platform
 
-### 🎯 **Targeting**
+## 🎯 **Targeting**
 
 **Problem Statement ID:** 26204<br>
 **Problem Statement Title:** Student Innovation-A solution/idea that can boost the current situation of the tourism industries including hotels, travel and others.<br>
@@ -13,7 +13,7 @@
 **Team Name:** vibe-coders <br>
 
 ---
-🎯 **Problem** <br>
+## 🎯 **Problem** <br>
 
 Finding a place is easy. Finding a good place to work is not. <br>
 While travelling, people may need a place to work or attend an important meeting: <br>
@@ -30,11 +30,11 @@ While travelling, people may need a place to work or attend an important meeting
 • Will the place be noisy at a particular time? <br>
 • Is the information recent and reliable? <br>
 
-💡 **Solution** <br>
+## 💡 **Solution** <br>
 
 SilentSpot is a Workation Tourism Intelligence Platform that analyzes acoustic conditions, connectivity, amenities, reliability, and geospatial data to identify and rank work-friendly locations. Using community-driven measurements and machine learning-based acoustic prediction, it helps users discover suitable places to work and travel with confidence.<br>
 
-**Short Overview**
+## **Short Overview**
 <h5>
 SilentSpot is a Workation Tourism Intelligence Platform that helps remote workers, students, and digital nomads discover and evaluate work-friendly places. It analyzes acoustic conditions, Wi-Fi connectivity, amenities, reliability, and location data to generate an intelligent Workation Score and predict how noise levels may change over time. By combining community-driven measurements, machine learning, and geospatial intelligence, SilentSpot makes it easier to find productive and comfortable places to work while exploring new destinations
 </h5>
@@ -87,7 +87,7 @@ To prevent data leakage, we utilize a strict **Venue-Grouped Split**, ensuring t
 
 
 ---
-▶️**Watch the Demo Video** <br>
+## ▶️**Watch the Demo Video** <br>
 
 **YouTube:** [Watch on YouTube] https://www.youtube.com/watch?v=oDWZ_CSJRcg   <br>
 
