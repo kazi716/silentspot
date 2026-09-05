@@ -1842,7 +1842,7 @@ function openVenueDetail(venueId) {
             const baseLevel = venue.dbAvg || 45;
             const labels = ['9 AM', '11 AM', '1 PM', '3 PM', '5 PM', '7 PM', '9 PM'];
             const isCafe = venue.category === 'cafe';
-            const dataPoints = labels.map((time, idx) => {
+            const dataPoints = venue.ml_forecast || labels.map((time, idx) => {
                 if (isCafe) {
                     if (idx === 2 || idx === 4) return baseLevel + 12 + Math.random()*3;
                     return baseLevel + Math.random()*5;
@@ -2442,11 +2442,10 @@ function initAddVenueModal() {
                         attribution: '&copy; OpenStreetMap'
                     }).addTo(addVenueMap);
                     
-                    const pinIcon = L.divIcon({
-                        className: 'add-venue-pin',
-                        html: `<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-size: 36px; text-shadow: 0 2px 4px rgba(0,0,0,0.4); transform: translate(-10px, -30px);">location_on</span>`,
-                        iconSize: [36, 36],
-                        iconAnchor: [18, 36]
+                    const pinIcon = L.icon({
+                        iconUrl: 'marker.png',
+                        iconSize: [40, 50],
+                        iconAnchor: [20, 50]
                     });
 
                     addVenueMarker = L.marker([state.currentLat, state.currentLng], { draggable: true, icon: pinIcon }).addTo(addVenueMap);

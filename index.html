@@ -98,6 +98,7 @@
             }
         }
     </script>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="styles.css"/>
 </head>
 <body class="bg-background text-on-background dark:bg-dark-bg dark:text-gray-100 font-body-md antialiased pb-24 md:pb-0 min-h-screen transition-colors duration-300">
@@ -122,17 +123,12 @@
     </div>
 
     <!-- Header Navigation (Desktop & Mobile TopBar) -->
-    <header class="sticky top-0 z-40 w-full bg-background/85 dark:bg-dark-bg/85 backdrop-blur-md border-b border-outline-variant/30 dark:border-dark-surface-border transition-colors">
+    <header class="sticky top-0 z-40 w-full bg-background/85 dark:bg-dark-bg/85 backdrop-blur-md border-b 
+border-outline-variant/30 dark:border-dark-surface-border transition-colors">
         <div class="max-w-7xl mx-auto px-container-margin py-3 flex items-center justify-between">
             <!-- Brand Logo -->
             <div class="flex items-center gap-2 cursor-pointer" id="nav-brand">
-                <div class="w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-sm">
-                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">graphic_eq</span>
-                </div>
-                <div>
-                    <span class="font-headline-md text-xl font-bold text-primary dark:text-primary-fixed-dim leading-none block">SilentSpot</span>
-                    <span class="text-[10px] text-secondary dark:text-gray-400 font-medium tracking-wider uppercase">Find Your Focus</span>
-                </div>
+                <img src="logo.png" alt="SilentSpot - Find Your Focus" class="h-10 object-contain drop-shadow-sm">
             </div>
 
             <!-- Nav Links (Desktop) -->
