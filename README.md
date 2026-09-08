@@ -1,5 +1,5 @@
 # **VibeCoders**
-# 🎙️ SilentSpot -   Smart Workation Platform for Finding Better Places to Work While Travelling
+# 🎙️ SilentSpot - Smart Workation Platform for Finding Better Places to Work While Travelling
 
 ## 🎯 **Targeting**
 
