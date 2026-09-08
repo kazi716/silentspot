@@ -1,16 +1,16 @@
-# **Vibe-Coders**
+# **VibeCoders**
 # 🎙️ SilentSpot - Workation Tourism Intelligence Platform
 
 ## 🎯 **Targeting**
 
-**Problem Statement ID:** 26204<br>
+**Problem Statement ID:** SIH26204<br>
 **Problem Statement Title:** Student Innovation-A solution/idea that can boost the current situation of the tourism industries including hotels, travel and others.<br>
 **Theme:** Travel & Tourism<br>
 **PS Category:** Software<br>
 **Description:** Technology ideas in tertiary sectors such as Hospitality, Financial Services, Entertainment, and Retail.<br>
 **Institution:** JIS University<br>
-**Team ID:**<br>
-**Team Name:** vibe-coders <br>
+**Team ID:** 121828<br>
+**Team Name:** VibeCoders <br>
 
 ---
 ## 🎯 **Problem** <br>
